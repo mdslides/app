@@ -5,7 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "i18n:report": "vue-cli-service i18n:report --src \"./src/**/*.?(js|vue)\" --locales \"./src/i18n/locales/**/*.json\""
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.1.2",
@@ -15,9 +16,11 @@
     "html-to-image": "^1.9.0",
     "lodash": "^4.17.21",
     "marked": "^4.0.18",
-    "vue": "^3.2.13"
+    "vue": "^3.2.13",
+    "vue-i18n": "^9.1.0"
   },
   "devDependencies": {
+    "@intlify/vue-i18n-loader": "^3.0.0",
     "@types/codemirror": "^5.60.5",
     "@types/dompurify": "^2.3.3",
     "@types/lodash": "^4.14.182",
@@ -37,7 +40,8 @@
     "prettier": "^2.4.1",
     "sass": "^1.32.7",
     "sass-loader": "^12.0.0",
-    "typescript": "~4.5.5"
+    "typescript": "~4.5.5",
+    "vue-cli-plugin-i18n": "~2.3.1"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"
