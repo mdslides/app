@@ -30,6 +30,8 @@ export default defineComponent({
 <style lang="scss" scoped>
 .home-view {
   display: flex;
+  margin: 0 auto;
+  max-width: 1200px;
   height: 100vh;
 
   & > * {
@@ -37,11 +39,28 @@ export default defineComponent({
 
     &:first-child {
       flex-basis: 70%;
-      border-right: 1px solid #ddd;
+      border-right: 1px solid var(--color-border);
     }
 
     &:last-child {
       flex-basis: 30%;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    border-right: 1px solid var(--color-border);
+    border-left: 1px solid var(--color-border);
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column-reverse;
+    height: auto;
+
+    & > * {
+      &:first-child {
+        border-top: 1px solid var(--color-border);
+        border-right: none;
+      }
     }
   }
 }

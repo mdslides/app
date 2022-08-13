@@ -87,13 +87,27 @@ export default defineComponent({
 
   &__display {
     padding: 16px;
+    overflow: auto;
 
     img {
       display: block;
-      max-width: 100%;
+      width: 100%;
 
       & + img {
         margin-top: 16px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      display: flex;
+
+      img {
+        max-width: 70%;
+
+        & + img {
+          margin-top: 0;
+          margin-left: 16px;
+        }
       }
     }
   }

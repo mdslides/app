@@ -647,42 +647,46 @@ export default defineComponent({
 
   &__toolbar {
     position: relative;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
+    display: flex;
+    gap: 4px;
+    padding: 16px;
+    border-bottom: 1px solid var(--color-border);
+    overflow-x: auto;
     user-select: none;
 
     a {
-      display: inline-block;
-      margin: 0;
-      width: 30px;
-      height: 30px;
+      display: block;
+      padding: 2px;
+      min-width: 36px;
+      height: 36px;
       border: 1px solid transparent;
-      border-radius: 2px;
+      border-radius: 50%;
       text-align: center;
-      text-decoration: none !important;
-      color: #2c3e50 !important;
+      text-decoration: none;
+      color: var(--color-text);
+      transition: border 0.1s;
       cursor: pointer;
-
-      &.active,
-      &:hover {
-        border-color: #95a5a6;
-        background: #fcfcfc;
-      }
 
       &::before {
         line-height: 30px;
+      }
+
+      &.active {
+        border-color: var(--color-text);
+      }
+
+      &:hover {
+        border-color: var(--color-border);
       }
     }
 
     i {
       &.separator {
         display: inline-block;
-        width: 0;
-        border-left: 1px solid #d9d9d9;
-        border-right: 1px solid #fff;
+        margin: 0 8px;
+        width: 1px;
+        background-color: var(--color-border);
         color: transparent;
-        text-indent: -10px;
-        margin: 0 6px;
 
         &:last-child {
           display: none;
