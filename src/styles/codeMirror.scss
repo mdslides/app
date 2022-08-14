@@ -1,6 +1,7 @@
 .CodeMirror {
   height: 100%;
-  padding: 10px;
+  background-color: var(--color-background);
+  color: var(--color-text);
   font: inherit;
   z-index: 1;
 
@@ -57,6 +58,10 @@
 
   &-placeholder {
     opacity: 0.5;
+  }
+
+  &-scroll {
+    padding: 16px;
   }
 
   &-sizer {

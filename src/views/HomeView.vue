@@ -1,19 +1,27 @@
 <template>
   <div class="home-view">
-    <MarkdownEditor v-model="content" />
+    <div class="home-view__header">
+      <AppLogo />
+    </div>
 
-    <SlidesPreview :value="content" />
+    <div class="home-view__split">
+      <MarkdownEditor v-model="content" />
+
+      <SlidesPreview :value="content" />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 
+import AppLogo from '../components/AppLogo.vue'
 import MarkdownEditor from '../components/MarkdownEditor.vue'
 import SlidesPreview from '../components/SlidesPreview.vue'
 
 export default defineComponent({
   components: {
+    AppLogo,
     MarkdownEditor,
     SlidesPreview,
   },
@@ -30,20 +38,30 @@ export default defineComponent({
 <style lang="scss" scoped>
 .home-view {
   display: flex;
+  flex-direction: column;
   margin: 0 auto;
   max-width: 1200px;
-  height: 100vh;
 
-  & > * {
-    flex: 1 0;
+  &__header {
+    padding: 16px;
+  }
 
-    &:first-child {
-      flex-basis: 70%;
-      border-right: 1px solid var(--color-border);
-    }
+  &__split {
+    display: flex;
+    height: calc(100vh - 80px);
+    border-top: 1px solid var(--color-border);
 
-    &:last-child {
-      flex-basis: 30%;
+    & > * {
+      flex: 1 0;
+
+      &:first-child {
+        flex-basis: 70%;
+        border-right: 1px solid var(--color-border);
+      }
+
+      &:last-child {
+        flex-basis: 30%;
+      }
     }
   }
 
@@ -53,13 +71,18 @@ export default defineComponent({
   }
 
   @media (max-width: 768px) {
-    flex-direction: column-reverse;
-    height: auto;
+    &__split {
+      flex-direction: column-reverse;
 
-    & > * {
-      &:first-child {
-        border-top: 1px solid var(--color-border);
-        border-right: none;
+      & > * {
+        &:first-child {
+          border-top: 1px solid var(--color-border);
+          border-right: none;
+        }
+
+        &:last-child {
+          min-height: 0;
+        }
       }
     }
   }

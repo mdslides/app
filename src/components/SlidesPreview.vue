@@ -1,8 +1,10 @@
 <template>
   <div class="slides-preview">
     <div class="slides-preview__render">
-      <template v-for="(slide, i) in slidesMarkup" :key="i">
-        <div ref="slidesRendered" v-html="slide" />
+      <template v-if="slidesMarkup.length">
+        <template v-for="(slide, i) in slidesMarkup" :key="i">
+          <div ref="slidesRendered" v-html="slide" />
+        </template>
       </template>
     </div>
 
@@ -46,9 +48,7 @@ export default defineComponent({
     }, 200)
 
     const slidesMarkup = computed(() => {
-      return sanitize(marked(props.value, markedOptions))
-        .split(/\n(?=<h[12])/)
-        .filter(Boolean)
+      return sanitize(marked(props.value, markedOptions)).split(/\n(?=<h[12])/)
     })
 
     watch(() => props.value, createSlidesSvg)
@@ -68,8 +68,6 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .slides-preview {
-  overflow: auto;
-
   &__render {
     position: fixed;
     top: 200vh;
@@ -87,6 +85,7 @@ export default defineComponent({
 
   &__display {
     padding: 16px;
+    height: 100%;
     overflow: auto;
 
     img {
@@ -100,9 +99,18 @@ export default defineComponent({
 
     @media (max-width: 768px) {
       display: flex;
+      padding-right: 0;
+      padding-left: 0;
+
+      &::before,
+      &::after {
+        content: '';
+        flex: 0 0 16px;
+      }
 
       img {
-        max-width: 70%;
+        width: auto;
+        height: 100%;
 
         & + img {
           margin-top: 0;

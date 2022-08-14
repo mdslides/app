@@ -644,15 +644,23 @@ export default defineComponent({
 .markdown-editor {
   display: flex;
   flex-direction: column;
+  min-height: 0;
 
   &__toolbar {
     position: relative;
     display: flex;
     gap: 4px;
-    padding: 16px;
+    padding: 16px 0;
+    min-height: 69px;
     border-bottom: 1px solid var(--color-border);
-    overflow-x: auto;
+    overflow: auto hidden;
     user-select: none;
+
+    &::before,
+    &::after {
+      content: '';
+      flex: 0 0 16px;
+    }
 
     a {
       display: block;
@@ -671,12 +679,12 @@ export default defineComponent({
         line-height: 30px;
       }
 
-      &.active {
-        border-color: var(--color-text);
-      }
-
       &:hover {
         border-color: var(--color-border);
+      }
+
+      &.active {
+        border-color: var(--color-text);
       }
     }
 

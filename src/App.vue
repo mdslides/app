@@ -25,9 +25,15 @@ export default defineComponent({
   box-sizing: border-box;
 }
 
+html {
+  font-size: 16px;
+}
+
 body {
   margin: 0;
   padding: 0;
+  background-color: var(--color-background);
+  color: var(--color-text);
 }
 
 #app {
