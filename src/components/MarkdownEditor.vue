@@ -18,7 +18,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import CodeMirror from 'codemirror'
 
 import 'codemirror/addon/display/placeholder'
@@ -68,15 +69,15 @@ const insertionTemplates = {
 
 const shortcuts = isMac
   ? {
-      cleanBlock: 'Cmd-E',
-      insertImage: 'Cmd-Alt-I',
-      insertLink: 'Cmd-K',
-      toggleBlockquote: "Cmd-'",
-      toggleBold: 'Cmd-B',
-      toggleHeading: 'Cmd-H',
-      toggleItalic: 'Cmd-I',
-      toggleOrderedList: 'Cmd-Alt-L',
-      toggleUnorderedList: 'Cmd-L',
+      cleanBlock: '⌘-E',
+      insertImage: '⌘-⌥-I',
+      insertLink: '⌘-K',
+      toggleBlockquote: "⌘-'",
+      toggleBold: '⌘-B',
+      toggleHeading: '⌘-H',
+      toggleItalic: '⌘-I',
+      toggleOrderedList: '⌘-⌥-L',
+      toggleUnorderedList: '⌘-L',
     }
   : {
       cleanBlock: 'Ctrl-E',
@@ -141,9 +142,9 @@ const getCursorTokens = (codeMirror: CodeMirror.Editor) => {
         break
       case 'variable-2':
         if (/^\s*\d+\.\s/.test(codeMirror.getLine(position.line))) {
-          tokens['ordered-list'] = true
+          tokens.orderedList = true
         } else {
-          tokens['unordered-list'] = true
+          tokens.unorderedList = true
         }
         break
     }
@@ -448,6 +449,7 @@ export default defineComponent({
   },
   emits: ['update:modelValue'],
   setup(props, { emit }) {
+    const { t } = useI18n()
     const container = ref<HTMLDivElement>()
     const cursorTokens = ref<Record<string, boolean>>({})
     let autosaveInterval: number
@@ -479,7 +481,10 @@ export default defineComponent({
 
       for (const key in shortcuts) {
         const keyTyped = key as keyof typeof shortcuts
-        extraKeys[shortcuts[keyTyped]] = () => {
+        const shortcut = shortcuts[keyTyped]
+          .replace('⌘', 'Cmd')
+          .replace('⌥', 'Alt')
+        extraKeys[shortcut] = () => {
           shortcutActions[keyTyped](codeMirror)
         }
       }
@@ -520,62 +525,51 @@ export default defineComponent({
       clearInterval(autosaveInterval)
     })
 
-    const getButtonTooltip = (title: string, shortcut?: string) => {
-      const tooltip = shortcut ? `${title} (${shortcut})` : title
-      return isMac ? tooltip.replace('Cmd', '⌘').replace('Alt', '⌥') : tooltip
-    }
-
-    const toolbarButtons = [
+    const toolbarButtons = computed(() => [
       [
         {
           action: () => toggleHeading(codeMirror),
           className: 'fa fa-header',
           name: 'heading',
-          tooltip: getButtonTooltip('Heading', shortcuts.toggleHeading),
+          tooltip: `${t('heading')} (${shortcuts.toggleHeading})`,
         },
         {
           action: () => toggleBold(codeMirror),
           className: 'fa fa-bold',
           name: 'bold',
-          tooltip: getButtonTooltip('Bold', shortcuts.toggleBold),
+          tooltip: `${t('bold')} (${shortcuts.toggleBold})`,
         },
         {
           action: () => toggleItalic(codeMirror),
           className: 'fa fa-italic',
           name: 'italic',
-          tooltip: getButtonTooltip('Italic', shortcuts.toggleItalic),
+          tooltip: `${t('italic')} (${shortcuts.toggleItalic})`,
         },
         {
           action: () => toggleStrikethrough(codeMirror),
           className: 'fa fa-strikethrough',
           name: 'strikethrough',
-          tooltip: getButtonTooltip('Strikethrough'),
+          tooltip: t('strikethrough'),
         },
       ],
       [
         {
           action: () => toggleOrderedList(codeMirror),
           className: 'fa fa-list-ol',
-          name: 'ordered-list',
-          tooltip: getButtonTooltip(
-            'Numbered List',
-            shortcuts.toggleOrderedList
-          ),
+          name: 'orderedList',
+          tooltip: `${t('orderedList')} (${shortcuts.toggleOrderedList})`,
         },
         {
           action: () => toggleUnorderedList(codeMirror),
           className: 'fa fa-list-ul',
-          name: 'unordered-list',
-          tooltip: getButtonTooltip(
-            'Bulleted List',
-            shortcuts.toggleUnorderedList
-          ),
+          name: 'unorderedList',
+          tooltip: `${t('unorderedList')} (${shortcuts.toggleUnorderedList})`,
         },
         {
           action: () => toggleBlockquote(codeMirror),
           className: 'fa fa-quote-right',
           name: 'quote',
-          tooltip: getButtonTooltip('Quote', shortcuts.toggleBlockquote),
+          tooltip: `${t('quote')} (${shortcuts.toggleBlockquote})`,
         },
       ],
       [
@@ -583,36 +577,33 @@ export default defineComponent({
           action: () => insertLink(codeMirror),
           className: 'fa fa-link',
           name: 'link',
-          tooltip: getButtonTooltip('Insert Link', shortcuts.insertLink),
+          tooltip: `${t('link')} (${shortcuts.insertLink})`,
         },
         {
           action: () => insertImage(codeMirror),
           className: 'fa fa-image',
           name: 'image',
-          tooltip: getButtonTooltip('Insert Image', shortcuts.insertImage),
+          tooltip: `${t('image')} (${shortcuts.insertImage})`,
         },
         {
           action: () => insertTable(codeMirror),
           className: 'fa fa-table',
           name: 'table',
-          tooltip: getButtonTooltip('Insert Table', shortcuts.insertImage),
+          tooltip: `${t('table')} (${shortcuts.insertImage})`,
         },
         {
           action: () => insertHorizontalRule(codeMirror),
           className: 'fa fa-minus',
-          name: 'horizontal-rule',
-          tooltip: getButtonTooltip(
-            'Insert Horizontal Line',
-            shortcuts.insertImage
-          ),
+          name: 'horizontalRule',
+          tooltip: `${t('horizontalRule')} (${shortcuts.insertImage})`,
         },
       ],
       [
         {
           action: () => cleanBlock(codeMirror),
           className: 'fa fa-eraser fa-clean-block',
-          name: 'clean-block',
-          tooltip: getButtonTooltip('Clean Block', shortcuts.cleanBlock),
+          name: 'cleanBlock',
+          tooltip: `${t('cleanBlock')} (${shortcuts.cleanBlock})`,
         },
       ],
       [
@@ -620,16 +611,16 @@ export default defineComponent({
           action: () => undo(codeMirror),
           className: 'fa fa-rotate-left no-disable',
           name: 'undo',
-          tooltip: getButtonTooltip('Undo'),
+          tooltip: t('undo'),
         },
         {
           action: () => redo(codeMirror),
           className: 'fa fa-rotate-right no-disable',
           name: 'redo',
-          tooltip: getButtonTooltip('Redo'),
+          tooltip: t('redo'),
         },
       ],
-    ]
+    ])
 
     return {
       container,
@@ -639,6 +630,27 @@ export default defineComponent({
   },
 })
 </script>
+
+<i18n>
+{
+  "en": {
+    "bold": "Bold",
+    "cleanBlock": "Clean Block",
+    "heading": "Heading",
+    "horizontalRule": "Insert Horizontal Line",
+    "image": "Insert Image",
+    "italic": "Italic",
+    "link": "Insert Link",
+    "orderedList": "Numbered List",
+    "quote": "Quote",
+    "redo": "Redo",
+    "strikethrough": "Strikethrough",
+    "table": "Insert Table",
+    "undo": "Undo",
+    "unorderedList": "Bulleted List"
+  }
+}
+</i18n>
 
 <style lang="scss" scoped>
 .markdown-editor {
