@@ -48,7 +48,7 @@ export default defineComponent({
 
   &__split {
     display: flex;
-    height: calc(100vh - 80px);
+    height: calc(100vh - 3rem - 32px);
     border-top: 1px solid var(--color-border);
 
     & > * {

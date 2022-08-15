@@ -17,19 +17,19 @@
     display: flex;
     justify-content: flex-end;
     align-items: flex-end;
-    padding: 8px;
-    width: 64px;
-    height: 48px;
+    padding: 0.5rem;
+    width: 4rem;
+    height: 3rem;
     background-color: var(--color-text);
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: 900;
     color: var(--color-background);
   }
 
   &__text {
-    margin-left: 6px;
-    line-height: 48px;
-    font-size: 32px;
+    margin-left: 0.5rem;
+    line-height: 3rem;
+    font-size: 2rem;
     font-weight: 500;
   }
 }

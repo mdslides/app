@@ -72,13 +72,14 @@ export default defineComponent({
     position: fixed;
     top: 200vh;
     left: 200vw;
+    color: #000;
     z-index: -100;
 
     & > * {
       padding: 20px;
       width: 400px;
       height: 300px;
-      background-color: gold;
+      background-color: #fff;
       overflow: hidden;
     }
   }
@@ -91,6 +92,8 @@ export default defineComponent({
     img {
       display: block;
       width: 100%;
+      border: 1px solid var(--color-border);
+      border-radius: 1px;
 
       & + img {
         margin-top: 16px;
@@ -116,6 +119,12 @@ export default defineComponent({
           margin-top: 0;
           margin-left: 16px;
         }
+      }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      img {
+        border: none;
       }
     }
   }
