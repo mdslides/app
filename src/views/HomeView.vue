@@ -2,6 +2,8 @@
   <div class="home-view">
     <div class="home-view__header">
       <AppLogo />
+
+      <NavigationBar />
     </div>
 
     <div class="home-view__split">
@@ -14,22 +16,27 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 import AppLogo from '../components/AppLogo.vue'
 import MarkdownEditor from '../components/MarkdownEditor.vue'
+import NavigationBar from '../components/NavigationBar.vue'
 import SlidesPreview from '../components/SlidesPreview.vue'
 
 export default defineComponent({
   components: {
     AppLogo,
     MarkdownEditor,
+    NavigationBar,
     SlidesPreview,
   },
   setup() {
+    const { t } = useI18n()
     const content = ref('')
 
     return {
       content,
+      t,
     }
   },
 })
@@ -43,7 +50,10 @@ export default defineComponent({
   max-width: 1200px;
 
   &__header {
+    display: flex;
+    gap: 32px;
     padding: 16px;
+    align-items: center;
   }
 
   &__split {
@@ -71,6 +81,10 @@ export default defineComponent({
   }
 
   @media (max-width: 768px) {
+    &__header {
+      justify-content: space-between;
+    }
+
     &__split {
       flex-direction: column-reverse;
 
