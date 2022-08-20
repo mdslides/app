@@ -22,7 +22,7 @@
     height: 3rem;
     background-color: var(--color-text);
     font-size: 1rem;
-    font-weight: 900;
+    font-weight: 800;
     color: var(--color-background);
   }
 

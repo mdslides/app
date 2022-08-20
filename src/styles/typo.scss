@@ -1,0 +1,27 @@
+$fonts: (
+  Mulish 200 italic 'Mulish-ExtraLightItalic',
+  Mulish 200 normal 'Mulish-ExtraLight',
+  Mulish 300 italic 'Mulish-LightItalic',
+  Mulish 300 normal 'Mulish-Light',
+  Mulish 400 italic 'Mulish-Italic',
+  Mulish 400 normal 'Mulish-Regular',
+  Mulish 500 italic 'Mulish-MediumItalic',
+  Mulish 500 normal 'Mulish-Medium',
+  Mulish 600 italic 'Mulish-SemiBoldItalic',
+  Mulish 600 normal 'Mulish-SemiBold',
+  Mulish 700 italic 'Mulish-BoldItalic',
+  Mulish 700 normal 'Mulish-Bold',
+  Mulish 800 italic 'Mulish-ExtraBoldItalic',
+  Mulish 800 normal 'Mulish-ExtraBold',
+  Mulish 900 italic 'Mulish-BlackItalic',
+  Mulish 900 normal 'Mulish-Black'
+);
+
+@each $family, $weight, $style, $file in $fonts {
+  @font-face {
+    font-family: $family;
+    font-weight: $weight;
+    font-style: $style;
+    src: url('assets/fonts/#{$file}.ttf');
+  }
+}

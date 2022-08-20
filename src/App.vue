@@ -18,6 +18,7 @@ export default defineComponent({
 @import '~@fortawesome/fontawesome-free/css/fontawesome.css';
 @import '~@fortawesome/fontawesome-free/css/solid.css';
 @import '~codemirror/lib/codemirror.css';
+@import 'styles/typo';
 @import 'styles/theme';
 @import 'styles/codeMirror';
 
@@ -37,7 +38,7 @@ body {
 }
 
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: Mulish, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
