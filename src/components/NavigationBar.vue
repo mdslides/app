@@ -9,15 +9,17 @@
         {{ t('file') }}
 
         <ul class="navigation-bar__list">
-          <li role="button">
+          <li role="button" @click="fileInput.click">
+            <input ref="fileInput" type="file" @change="handleFileUpload" />
+
             <span>{{ t('open') }}</span>
           </li>
 
-          <li role="button">
+          <li role="button" @click="$emit('download')">
             <span>{{ t('downloadAsMD') }}</span>
           </li>
 
-          <li role="button">
+          <li role="button" @click="$emit('export')">
             <span>{{ t('exportAsPDF') }}</span>
           </li>
         </ul>
@@ -31,9 +33,30 @@ import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
-  setup() {
+  emits: ['download', 'export', 'upload'],
+  setup(props, { emit }) {
     const { t } = useI18n()
+    const fileInput = ref<HTMLInputElement>()
     const activeGroup = ref<string | null>(null)
+
+    const handleFileUpload = (e: InputEvent) => {
+      activeGroup.value = null
+
+      const file = (e.target as HTMLInputElement)?.files?.[0]
+      if (!file) {
+        return
+      }
+
+      const fileReader = new FileReader()
+      fileReader.onload = (data) => {
+        emit('upload', data.target?.result)
+      }
+      fileReader.readAsText(file)
+
+      if (fileInput.value) {
+        fileInput.value.value = ''
+      }
+    }
 
     const handleGroupClick = (group: string) => {
       if (activeGroup.value === group) {
@@ -53,6 +76,8 @@ export default defineComponent({
 
     return {
       activeGroup,
+      fileInput,
+      handleFileUpload,
       handleGroupClick,
       t,
     }
@@ -73,6 +98,8 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .navigation-bar {
+  user-select: none;
+
   ul {
     margin: 0;
     padding: 0;
@@ -86,6 +113,10 @@ export default defineComponent({
     color: var(--color-text);
     outline: none;
     cursor: pointer;
+  }
+
+  input[type='file'] {
+    display: none;
   }
 
   &__group {

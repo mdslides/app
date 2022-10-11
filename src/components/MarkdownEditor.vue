@@ -18,7 +18,14 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeUnmount, onMounted, ref } from 'vue'
+import {
+  computed,
+  defineComponent,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch,
+} from 'vue'
 import { useI18n } from 'vue-i18n'
 import CodeMirror from 'codemirror'
 
@@ -442,12 +449,12 @@ export default defineComponent({
       type: String,
       default: '',
     },
-    modelValue: {
+    value: {
       type: String,
       default: '',
     },
   },
-  emits: ['update:modelValue'],
+  emits: ['input'],
   setup(props, { emit }) {
     const { t } = useI18n()
     const container = ref<HTMLDivElement>()
@@ -500,15 +507,15 @@ export default defineComponent({
       })
 
       codeMirror.on('update', () => {
-        emit('update:modelValue', codeMirror.getValue())
+        emit('input', codeMirror.getValue())
       })
 
-      if (props.modelValue) {
-        codeMirror.setValue(props.modelValue)
+      if (props.value) {
+        codeMirror.setValue(props.value)
       }
 
       if (isLocalStorageAvailable()) {
-        if (!props.modelValue) {
+        if (!props.value) {
           const autosavedValue = getAutosavedValue()
           if (autosavedValue) {
             codeMirror.setValue(autosavedValue)
@@ -524,6 +531,13 @@ export default defineComponent({
     onBeforeUnmount(() => {
       clearInterval(autosaveInterval)
     })
+
+    watch(
+      () => props.value,
+      () => {
+        codeMirror.setValue(props.value)
+      }
+    )
 
     const toolbarButtons = computed(() => [
       [

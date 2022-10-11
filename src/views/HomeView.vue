@@ -3,13 +3,17 @@
     <div class="home-view__header">
       <AppLogo />
 
-      <NavigationBar />
+      <NavigationBar
+        @download="handleDownload"
+        @export="handleExport"
+        @upload="handleUpload"
+      />
     </div>
 
     <div class="home-view__split">
-      <MarkdownEditor v-model="content" />
+      <MarkdownEditor :value="contentOpened" @input="content = $event" />
 
-      <SlidesPreview :value="content" />
+      <SlidesPreview :value="content" @render="slideCanvases = $event" />
     </div>
   </div>
 </template>
@@ -17,6 +21,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { jsPDF } from 'jspdf'
 
 import AppLogo from '../components/AppLogo.vue'
 import MarkdownEditor from '../components/MarkdownEditor.vue'
@@ -33,9 +38,51 @@ export default defineComponent({
   setup() {
     const { t } = useI18n()
     const content = ref('')
+    const contentOpened = ref('')
+    const slideCanvases = ref<HTMLCanvasElement[]>([])
+
+    const handleDownload = () => {
+      const file = new File([content.value], 'slides.md', {
+        type: 'text/plain',
+      })
+      const linkEl = document.createElement('a')
+      const objectUrl = URL.createObjectURL(file)
+      linkEl.href = objectUrl
+      linkEl.download = file.name
+      document.body.appendChild(linkEl)
+      linkEl.click()
+      document.body.removeChild(linkEl)
+      window.URL.revokeObjectURL(objectUrl)
+    }
+
+    const handleExport = () => {
+      const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'px',
+        format: [400, 300],
+      })
+
+      slideCanvases.value.forEach((canvas, i) => {
+        if (i !== 0) {
+          doc.addPage()
+        }
+        doc.addImage(canvas, 'PNG', 0, 0, 400, 300)
+      })
+
+      doc.save('slides.pdf')
+    }
+
+    const handleUpload = (value: string) => {
+      contentOpened.value = value
+    }
 
     return {
       content,
+      contentOpened,
+      slideCanvases,
+      handleDownload,
+      handleExport,
+      handleUpload,
       t,
     }
   },

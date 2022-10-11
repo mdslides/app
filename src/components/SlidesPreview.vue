@@ -10,7 +10,7 @@
 
     <div class="slides-preview__display">
       <template v-for="(slide, i) in slidesSvg" :key="i">
-        <img :src="slide" class="slides-preview__slide" />
+        <img :src="slide" />
       </template>
     </div>
   </div>
@@ -18,10 +18,10 @@
 
 <script lang="ts">
 import { computed, defineComponent, nextTick, onMounted, ref, watch } from 'vue'
+import { throttle } from 'lodash'
 import { marked } from 'marked'
 import { sanitize } from 'dompurify'
-import { toSvg } from 'html-to-image'
-import { throttle } from 'lodash'
+import { toCanvas, toSvg } from 'html-to-image'
 
 const markedOptions: marked.MarkedOptions = {
   breaks: true,
@@ -35,15 +35,18 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props) {
-    const slidesRendered = ref<HTMLDivElement[]>()
-    const slidesSvg = ref<string[]>()
+  emits: ['render'],
+  setup(props, { emit }) {
+    const slidesRendered = ref<HTMLDivElement[]>([])
+    const slidesSvg = ref<string[]>([])
 
     const createSlidesSvg = throttle(() => {
       nextTick(async () => {
-        slidesSvg.value = slidesRendered.value?.length
-          ? await Promise.all(slidesRendered.value.map((item) => toSvg(item)))
-          : []
+        const svgs = slidesRendered.value.map((item) => toSvg(item))
+        slidesSvg.value = await Promise.all(svgs)
+
+        const canvases = slidesRendered.value.map((item) => toCanvas(item))
+        emit('render', await Promise.all(canvases))
       })
     }, 200)
 
