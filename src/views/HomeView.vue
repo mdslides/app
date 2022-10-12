@@ -19,14 +19,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue'
+import { defineComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { debounce } from 'lodash'
 import { jsPDF } from 'jspdf'
 
+import { isLocalStorageAvailable } from '@/utils'
 import AppLogo from '../components/AppLogo.vue'
 import MarkdownEditor from '../components/MarkdownEditor.vue'
 import NavigationBar from '../components/NavigationBar.vue'
 import SlidesPreview from '../components/SlidesPreview.vue'
+
+const autosaveKey = 'mdslides_draft'
 
 export default defineComponent({
   components: {
@@ -75,6 +79,21 @@ export default defineComponent({
     const handleUpload = (value: string) => {
       contentOpened.value = value
     }
+
+    if (isLocalStorageAvailable()) {
+      watch(
+        content,
+        debounce(() => {
+          localStorage.setItem(autosaveKey, content.value)
+        }, 1600)
+      )
+    }
+
+    onMounted(() => {
+      if (isLocalStorageAvailable()) {
+        contentOpened.value = localStorage.getItem(autosaveKey) ?? ''
+      }
+    })
 
     return {
       content,

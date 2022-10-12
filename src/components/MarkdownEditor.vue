@@ -18,14 +18,7 @@
 </template>
 
 <script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  watch,
-} from 'vue'
+import { computed, defineComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CodeMirror from 'codemirror'
 
@@ -36,10 +29,8 @@ import 'codemirror/mode/gfm/gfm'
 import 'codemirror/mode/markdown/markdown'
 import 'codemirror/mode/xml/xml'
 
-import { isLocalStorageAvailable, isMac } from '../utils/common'
+import { isMac } from '@/utils'
 
-const autosaveDelay = 10000
-const autosaveKey = 'mdslides_draft'
 const defaultUrl = 'http://'
 
 const codeMirrorOptions: CodeMirror.EditorConfiguration = {
@@ -97,11 +88,6 @@ const shortcuts = isMac
       toggleOrderedList: 'Ctrl-Alt-L',
       toggleUnorderedList: 'Ctrl-L',
     }
-
-const getAutosavedValue = () => {
-  const value = localStorage.getItem(autosaveKey)
-  return typeof value == 'string' && value !== '' ? value : null
-}
 
 const getCursorTokens = (codeMirror: CodeMirror.Editor) => {
   const position = codeMirror.getCursor('start')
@@ -459,7 +445,6 @@ export default defineComponent({
     const { t } = useI18n()
     const container = ref<HTMLDivElement>()
     const cursorTokens = ref<Record<string, boolean>>({})
-    let autosaveInterval: number
     let codeMirror: CodeMirror.Editor
 
     onMounted(() => {
@@ -513,23 +498,6 @@ export default defineComponent({
       if (props.value) {
         codeMirror.setValue(props.value)
       }
-
-      if (isLocalStorageAvailable()) {
-        if (!props.value) {
-          const autosavedValue = getAutosavedValue()
-          if (autosavedValue) {
-            codeMirror.setValue(autosavedValue)
-          }
-        }
-
-        autosaveInterval = setInterval(() => {
-          localStorage.setItem(autosaveKey, codeMirror.getValue())
-        }, autosaveDelay)
-      }
-    })
-
-    onBeforeUnmount(() => {
-      clearInterval(autosaveInterval)
     })
 
     watch(
