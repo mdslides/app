@@ -13,6 +13,7 @@
 <style lang="scss" scoped>
 .app-logo {
   display: flex;
+  line-height: 1rem;
   font-size: 1rem;
   font-weight: 700;
   user-select: none;

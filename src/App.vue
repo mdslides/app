@@ -18,7 +18,6 @@ export default defineComponent({
 @import '~@fortawesome/fontawesome-free/css/fontawesome.css';
 @import '~@fortawesome/fontawesome-free/css/solid.css';
 @import '~codemirror/lib/codemirror.css';
-@import 'styles/typo';
 @import 'styles/theme';
 @import 'styles/codeMirror';
 
