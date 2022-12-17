@@ -4,7 +4,11 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { useI18n } from 'vue-i18n'
+
+import {
+  useLanguageInitialize,
+  useLanguagePreserve,
+} from '@/functions/language'
 
 import HomeView from './views/HomeView.vue'
 
@@ -13,13 +17,8 @@ export default defineComponent({
     HomeView,
   },
   setup() {
-    const { fallbackLocale, locale } = useI18n()
-
-    const searchParams = new URLSearchParams(window.location.search)
-    if (searchParams.has('lang')) {
-      locale.value = searchParams.get('lang') ?? fallbackLocale.value.toString()
-      window.history.pushState(undefined, '', window.location.pathname)
-    }
+    useLanguagePreserve()
+    useLanguageInitialize()
   },
 })
 </script>
