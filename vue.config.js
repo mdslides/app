@@ -14,4 +14,17 @@ module.exports = defineConfig({
       fullInstall: true,
     },
   },
+  pwa: {
+    name: 'mdslides',
+    themeColor: '#fff',
+    msTileColor: '#fff',
+    manifestOptions: {
+      description: 'Markdown slides editor',
+      display: 'minimal-ui',
+      background_color: '#fff',
+      scope: process.env.PUBLIC_PATH,
+      start_url: process.env.PUBLIC_PATH,
+    },
+    workboxPluginMode: 'GenerateSW',
+  },
 })
