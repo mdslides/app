@@ -1,7 +1,9 @@
 <template>
   <div class="home-view">
     <div class="home-view__header">
-      <AppLogo />
+      <a :href="appLogoLink">
+        <AppLogo />
+      </a>
 
       <NavigationBar
         @download="handleDownload"
@@ -19,7 +21,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref, watch } from 'vue'
+import { computed, defineComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { debounce } from 'lodash'
 import { jsPDF } from 'jspdf'
@@ -40,7 +42,7 @@ export default defineComponent({
     SlidesPreview,
   },
   setup() {
-    const { t } = useI18n()
+    const { fallbackLocale, locale, t } = useI18n()
     const content = ref('')
     const contentOpened = ref('')
     const slideCanvases = ref<HTMLCanvasElement[]>([])
@@ -80,6 +82,10 @@ export default defineComponent({
       contentOpened.value = value
     }
 
+    const appLogoLink = computed(() => {
+      return locale.value === fallbackLocale.value ? '/' : `/${locale.value}/`
+    })
+
     if (isLocalStorageAvailable()) {
       watch(
         content,
@@ -96,6 +102,7 @@ export default defineComponent({
     })
 
     return {
+      appLogoLink,
       content,
       contentOpened,
       slideCanvases,
@@ -120,6 +127,10 @@ export default defineComponent({
     gap: 32px;
     padding: 16px;
     align-items: center;
+
+    & > a {
+      text-decoration: none;
+    }
   }
 
   &__split {

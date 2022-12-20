@@ -36,6 +36,7 @@
     padding: 0.5rem 0.2rem;
     width: 4rem;
     height: 3rem;
+    color: var(--color-text);
     letter-spacing: -0.025em;
   }
 }
