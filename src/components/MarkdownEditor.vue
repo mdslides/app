@@ -501,6 +501,13 @@ export default defineComponent({
     })
 
     watch(
+      () => props.placeholder,
+      () => {
+        codeMirror.setOption('placeholder', props.placeholder)
+      }
+    )
+
+    watch(
       () => props.value,
       () => {
         codeMirror.setValue(props.value)

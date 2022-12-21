@@ -13,7 +13,11 @@
     </div>
 
     <div class="home-view__split">
-      <MarkdownEditor :value="contentOpened" @input="content = $event" />
+      <MarkdownEditor
+        :placeholder="t('editorPlaceholder')"
+        :value="contentOpened"
+        @input="content = $event"
+      />
 
       <SlidesPreview :value="content" @render="slideCanvases = $event" />
     </div>
@@ -114,6 +118,17 @@ export default defineComponent({
   },
 })
 </script>
+
+<i18n>
+{
+  "be": {
+    "editorPlaceholder": "Pačnicie nabirać tekst tut..."
+  },
+  "en": {
+    "editorPlaceholder": "Start typing here..."
+  }
+}
+</i18n>
 
 <style lang="scss" scoped>
 .home-view {
