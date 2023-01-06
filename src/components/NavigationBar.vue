@@ -1,6 +1,6 @@
 <template>
   <nav class="navigation-bar">
-    <ul class="navigation-bar__group">
+    <ul>
       <li
         role="button"
         :class="{ active: activeGroup === 'file' }"
@@ -8,7 +8,7 @@
       >
         {{ t('file') }}
 
-        <ul class="navigation-bar__list">
+        <ul>
           <li role="button" @click="fileInput.click">
             <input ref="fileInput" type="file" @change="handleFileUpload" />
 
@@ -98,7 +98,13 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .navigation-bar {
+  display: flex;
+  gap: 4px;
   user-select: none;
+
+  input[type='file'] {
+    display: none;
+  }
 
   ul {
     margin: 0;
@@ -115,23 +121,29 @@ export default defineComponent({
     cursor: pointer;
   }
 
-  input[type='file'] {
-    display: none;
-  }
+  & > ul {
+    &.compact {
+      text-transform: capitalize;
 
-  &__group {
-    display: flex;
-    gap: 4px;
+      ul {
+        right: -1px;
+        left: -1px;
 
-    & > * {
+        li {
+          width: 100%;
+          max-width: 100%;
+        }
+      }
+    }
+
+    & > li {
       position: relative;
       border: 1px solid transparent;
       transition: border 0.1s;
       z-index: 101;
-      cursor: default;
 
       &:hover {
-        border: 1px solid var(--color-border);
+        border-color: var(--color-border);
       }
 
       &.active {
@@ -142,49 +154,51 @@ export default defineComponent({
           pointer-events: all;
         }
       }
-    }
-  }
 
-  &__list {
-    position: absolute;
-    top: 100%;
-    left: -1px;
-    border: 1px solid var(--color-border);
-    background-color: var(--color-background);
-    opacity: 0;
-    transition: opacity 0.1s;
-    pointer-events: none;
+      ul {
+        position: absolute;
+        top: 100%;
+        left: -1px;
+        border: 1px solid var(--color-border);
+        background-color: var(--color-background);
+        opacity: 0;
+        transition: opacity 0.1s;
+        pointer-events: none;
 
-    & > * {
-      width: 100vw;
-      max-width: 240px;
+        li {
+          width: 100vw;
+          max-width: 240px;
 
-      &:first-child {
-        padding-top: 8px;
-      }
+          &:first-child {
+            padding-top: 8px;
+          }
 
-      &:last-child {
-        padding-bottom: 8px;
-      }
+          &:last-child {
+            padding-bottom: 8px;
+          }
 
-      &:hover {
-        span {
-          border-color: var(--color-text);
+          &:hover {
+            span {
+              border-color: var(--color-text);
+            }
+          }
+
+          span {
+            border-bottom: 1px solid transparent;
+            transition: border 0.1s;
+          }
         }
-      }
-
-      span {
-        border-bottom: 1px solid transparent;
-        transition: border 0.1s;
       }
     }
   }
 
   @media (max-width: 768px) {
-    ul {
-      ul {
-        right: -1px;
-        left: auto;
+    & > ul {
+      & > li {
+        ul {
+          right: -1px;
+          left: auto;
+        }
       }
     }
   }
