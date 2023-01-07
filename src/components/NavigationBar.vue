@@ -25,6 +25,29 @@
         </ul>
       </li>
     </ul>
+
+    <ul class="compact">
+      <li
+        role="button"
+        :class="{ active: activeGroup === 'language' }"
+        @click="handleGroupClick('language')"
+      >
+        {{ locale }}
+
+        <ul>
+          <template v-for="item in availableLocales">
+            <li
+              v-if="item !== locale"
+              :key="item"
+              role="button"
+              @click="locale = item"
+            >
+              <span>{{ item }}</span>
+            </li>
+          </template>
+        </ul>
+      </li>
+    </ul>
   </nav>
 </template>
 
@@ -35,6 +58,7 @@ import { useI18n } from 'vue-i18n'
 export default defineComponent({
   emits: ['download', 'export', 'upload'],
   setup(props, { emit }) {
+    const { availableLocales, locale } = useI18n({ useScope: 'global' })
     const { t } = useI18n()
     const fileInput = ref<HTMLInputElement>()
     const activeGroup = ref<string | null>(null)
@@ -76,7 +100,9 @@ export default defineComponent({
 
     return {
       activeGroup,
+      availableLocales,
       fileInput,
+      locale,
       handleFileUpload,
       handleGroupClick,
       t,
