@@ -28,6 +28,7 @@
 import { computed, defineComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { debounce } from 'lodash'
+import { fileOpen, fileSave } from 'browser-fs-access'
 import { jsPDF } from 'jspdf'
 
 import { isLocalStorageAvailable } from '@/utils'
@@ -51,39 +52,56 @@ export default defineComponent({
     const contentOpened = ref('')
     const slideCanvases = ref<HTMLCanvasElement[]>([])
 
-    const handleDownload = () => {
-      const file = new File([content.value], 'slides.md', {
-        type: 'text/plain',
-      })
-      const linkEl = document.createElement('a')
-      const objectUrl = URL.createObjectURL(file)
-      linkEl.href = objectUrl
-      linkEl.download = file.name
-      document.body.appendChild(linkEl)
-      linkEl.click()
-      document.body.removeChild(linkEl)
-      window.URL.revokeObjectURL(objectUrl)
+    const handleDownload = async () => {
+      try {
+        const blob = new Blob([content.value], {
+          type: 'text/plain',
+        })
+
+        await fileSave(blob, {
+          extensions: ['.md'],
+        })
+      } catch {
+        // ignore
+      }
     }
 
-    const handleExport = () => {
-      const doc = new jsPDF({
-        orientation: 'landscape',
-        unit: 'px',
-        format: [400, 300],
-      })
+    const handleExport = async () => {
+      try {
+        const doc = new jsPDF({
+          orientation: 'landscape',
+          unit: 'px',
+          format: [400, 300],
+        })
 
-      slideCanvases.value.forEach((canvas, i) => {
-        if (i !== 0) {
-          doc.addPage()
-        }
-        doc.addImage(canvas, 'PNG', 0, 0, 400, 300)
-      })
+        slideCanvases.value.forEach((canvas, i) => {
+          if (i !== 0) {
+            doc.addPage()
+          }
+          doc.addImage(canvas, 'PNG', 0, 0, 400, 300)
+        })
 
-      doc.save('slides.pdf')
+        const blob = new Blob([doc.output('blob')], {
+          type: 'application/pdf',
+        })
+
+        await fileSave(blob)
+      } catch {
+        // ignore
+      }
     }
 
-    const handleUpload = (value: string) => {
-      contentOpened.value = value
+    const handleUpload = async () => {
+      try {
+        const blob = await fileOpen({
+          mimeTypes: ['text/*'],
+          extensions: ['.md'],
+        })
+
+        contentOpened.value = await new Response(blob).text()
+      } catch {
+        // ignore
+      }
     }
 
     const appLogoLink = computed(() => {

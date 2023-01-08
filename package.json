@@ -11,6 +11,7 @@
   "dependencies": {
     "@fontsource/mulish": "^4.5.13",
     "@fortawesome/fontawesome-free": "^6.1.2",
+    "browser-fs-access": "^0.31.1",
     "codemirror": "^5.65.7",
     "core-js": "^3.8.3",
     "dompurify": "^2.3.10",

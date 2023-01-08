@@ -9,9 +9,7 @@
         {{ t('file') }}
 
         <ul>
-          <li role="button" @click="fileInput.click">
-            <input ref="fileInput" type="file" @change="handleFileUpload" />
-
+          <li role="button" @click="$emit('upload')">
             <span>{{ t('open') }}</span>
           </li>
 
@@ -57,30 +55,10 @@ import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
   emits: ['download', 'export', 'upload'],
-  setup(props, { emit }) {
+  setup() {
     const { availableLocales, locale } = useI18n({ useScope: 'global' })
     const { t } = useI18n()
-    const fileInput = ref<HTMLInputElement>()
     const activeGroup = ref<string | null>(null)
-
-    const handleFileUpload = (e: InputEvent) => {
-      activeGroup.value = null
-
-      const file = (e.target as HTMLInputElement)?.files?.[0]
-      if (!file) {
-        return
-      }
-
-      const fileReader = new FileReader()
-      fileReader.onload = (data) => {
-        emit('upload', data.target?.result)
-      }
-      fileReader.readAsText(file)
-
-      if (fileInput.value) {
-        fileInput.value.value = ''
-      }
-    }
 
     const handleGroupClick = (group: string) => {
       if (activeGroup.value === group) {
@@ -101,9 +79,7 @@ export default defineComponent({
     return {
       activeGroup,
       availableLocales,
-      fileInput,
       locale,
-      handleFileUpload,
       handleGroupClick,
       t,
     }
@@ -133,10 +109,6 @@ export default defineComponent({
   display: flex;
   gap: 4px;
   user-select: none;
-
-  input[type='file'] {
-    display: none;
-  }
 
   ul {
     margin: 0;
