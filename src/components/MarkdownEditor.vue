@@ -622,6 +622,22 @@ export default defineComponent({
 
 <i18n>
 {
+  "be": {
+    "bold": "Toŭsty",
+    "cleanBlock": "Ačyścić błok",
+    "heading": "Zahałovak",
+    "horizontalRule": "Ustavić haryzantalnuju liniju",
+    "image": "Ustavić vyjavu",
+    "italic": "Kursyŭny",
+    "link": "Ustavić spasyłku",
+    "orderedList": "Numaravany śpis",
+    "quote": "Cytata",
+    "redo": "Paŭtaryć",
+    "strikethrough": "Zakreśleny",
+    "table": "Ustavić tablicu",
+    "undo": "Admianić",
+    "unorderedList": "Markavany śpis"
+  },
   "en": {
     "bold": "Bold",
     "cleanBlock": "Clean Block",

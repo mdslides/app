@@ -113,6 +113,12 @@ export default defineComponent({
 
 <i18n>
 {
+  "be": {
+    "downloadAsMD": "Spampavać jak Markdown",
+    "exportAsPDF": "Ekspartavać jak PDF",
+    "file": "Fajł",
+    "open": "Adkryć Markdown fajł"
+  },
   "en": {
     "downloadAsMD": "Download as Markdown",
     "exportAsPDF": "Export as PDF",
