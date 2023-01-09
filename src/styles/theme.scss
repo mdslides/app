@@ -1,9 +1,11 @@
+@import 'mixins';
+
 :root {
   --color-background: #fff;
   --color-border: #ddd;
   --color-text: #111;
 
-  @media (prefers-color-scheme: dark) {
+  @include color-scheme-dark {
     --color-background: #111;
     --color-border: #444;
     --color-text: #fff;

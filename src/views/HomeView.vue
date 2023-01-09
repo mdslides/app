@@ -149,6 +149,9 @@ export default defineComponent({
 </i18n>
 
 <style lang="scss" scoped>
+@import '@/styles/variables';
+@import '@/styles/mixins';
+
 .home-view {
   display: flex;
   flex-direction: column;
@@ -172,25 +175,23 @@ export default defineComponent({
     border-top: 1px solid var(--color-border);
 
     & > * {
-      flex: 1 0;
-
       &:first-child {
-        flex-basis: 70%;
+        flex: 1 0;
         border-right: 1px solid var(--color-border);
+        overflow: hidden;
       }
 
       &:last-child {
-        flex-basis: 30%;
+        flex: 0 0 min-content;
       }
     }
   }
 
-  @media (min-width: 1200px) {
-    border-right: 1px solid var(--color-border);
-    border-left: 1px solid var(--color-border);
+  @include media-breakpoint-up($lg) {
+    box-shadow: 0 0 0 1px var(--color-border);
   }
 
-  @media (max-width: 768px) {
+  @include media-breakpoint-down($sm) {
     &__header {
       justify-content: space-between;
     }

@@ -1,0 +1,72 @@
+@import 'variables';
+
+// Breakpoint helpers
+
+$breakpoints: 0, $sm, $lg;
+
+@function breakpoint-max($breakpoint) {
+  @return if($breakpoint > 0, $breakpoint - 0.02, null);
+}
+
+@function breakpoint-min($breakpoint) {
+  @return if($breakpoint != 0, $breakpoint, null);
+}
+
+@function breakpoint-next($breakpoint) {
+  $n: index($breakpoints, $breakpoint);
+
+  @return if($n < length($breakpoints), nth($breakpoints, $n + 1), null);
+}
+
+// Breakpoints
+
+@mixin media-breakpoint-down($breakpoint) {
+  $max: breakpoint-max($breakpoint);
+
+  @if $max {
+    @media (max-width: $max) {
+      @content;
+    }
+  } @else {
+    @content;
+  }
+}
+
+@mixin media-breakpoint-only($breakpoint) {
+  $min: breakpoint-min($breakpoint);
+  $max: breakpoint-next($breakpoint);
+
+  @if $min != null and $max != null {
+    @media (min-width: $min) and (max-width: $max) {
+      @content;
+    }
+  } @else if $max == null {
+    @include media-breakpoint-up($min) {
+      @content;
+    }
+  } @else if $min == null {
+    @include media-breakpoint-down($max) {
+      @content;
+    }
+  }
+}
+
+@mixin media-breakpoint-up($breakpoint) {
+  $min: breakpoint-min($breakpoint);
+
+  @if $min {
+    @media (min-width: $min) {
+      @content;
+    }
+  } @else {
+    @content;
+  }
+}
+
+// Color schemes
+
+@mixin color-scheme-dark {
+  @media (prefers-color-scheme: dark) {
+    @content;
+  }
+}
