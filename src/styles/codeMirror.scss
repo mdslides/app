@@ -1,4 +1,6 @@
 .CodeMirror {
+  $self: &;
+
   height: 100%;
   background-color: var(--color-background);
   color: var(--color-text);
@@ -66,5 +68,16 @@
 
   &-sizer {
     height: 100%;
+  }
+
+  &-selected {
+    background-color: var(--color-selection-inactive);
+    transition: background-color 0.1s;
+  }
+
+  &-focused {
+    #{$self}-selected {
+      background-color: var(--color-selection);
+    }
   }
 }

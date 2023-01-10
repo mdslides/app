@@ -30,6 +30,10 @@ export default defineComponent({
 @import 'styles/theme';
 @import 'styles/codeMirror';
 
+::selection {
+  background-color: var(--color-selection);
+}
+
 * {
   box-sizing: border-box;
 }
