@@ -206,6 +206,7 @@ export default defineComponent({
         }
 
         &:last-child {
+          flex-basis: calc(25vh + 32px); // Safari fallback
           min-height: 0;
         }
       }
