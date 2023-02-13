@@ -44,6 +44,7 @@ export default defineComponent({
 
 html {
   font-size: 16px;
+  overflow: hidden;
 }
 
 body {
