@@ -1,5 +1,5 @@
 <template>
-  <div class="slides-preview">
+  <div id="slidesPreview" class="slides-preview">
     <template v-for="(slide, i) in slidesMarkup" :key="i">
       <div v-html="slide" class="slides-preview__slide" />
     </template>

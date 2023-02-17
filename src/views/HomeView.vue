@@ -19,7 +19,7 @@
         @input="content = $event"
       />
 
-      <SlidesPreview :value="content" @render="slideCanvases = $event" />
+      <SlidesPreview :value="content" />
     </div>
   </div>
 </template>
@@ -29,9 +29,8 @@ import { computed, defineComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { debounce } from 'lodash'
 import { fileOpen, fileSave } from 'browser-fs-access'
-import { jsPDF } from 'jspdf'
 
-import { isLocalStorageAvailable } from '@/utils'
+import { createPdf, isLocalStorageAvailable } from '@/utils'
 import AppLogo from '../components/AppLogo.vue'
 import MarkdownEditor from '../components/MarkdownEditor.vue'
 import NavigationBar from '../components/NavigationBar.vue'
@@ -50,7 +49,6 @@ export default defineComponent({
     const { fallbackLocale, locale, t } = useI18n()
     const content = ref('')
     const contentOpened = ref('')
-    const slideCanvases = ref<HTMLCanvasElement[]>([])
 
     const handleDownload = async () => {
       try {
@@ -68,24 +66,11 @@ export default defineComponent({
 
     const handleExport = async () => {
       try {
-        const doc = new jsPDF({
-          orientation: 'landscape',
-          unit: 'px',
-          format: [400, 300],
-        })
-
-        slideCanvases.value.forEach((canvas, i) => {
-          if (i !== 0) {
-            doc.addPage()
-          }
-          doc.addImage(canvas, 'PNG', 0, 0, 400, 300)
-        })
-
-        const blob = new Blob([doc.output('blob')], {
-          type: 'application/pdf',
-        })
-
-        await fileSave(blob)
+        const slidesContainer = document.getElementById('slidesPreview')
+        if (slidesContainer?.children.length) {
+          const blob = await createPdf(slidesContainer.children)
+          await fileSave(blob)
+        }
       } catch {
         // ignore
       }
@@ -127,7 +112,6 @@ export default defineComponent({
       appLogoLink,
       content,
       contentOpened,
-      slideCanvases,
       handleDownload,
       handleExport,
       handleUpload,
