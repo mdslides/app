@@ -6,19 +6,19 @@
         :class="{ active: activeGroup === 'file' }"
         @click="handleGroupClick('file')"
       >
-        {{ t('file') }}
+        {{ t('NavigationBar.file') }}
 
         <ul>
           <li role="button" @click="$emit('upload')">
-            <span>{{ t('open') }}</span>
+            <span>{{ t('NavigationBar.open') }}</span>
           </li>
 
           <li role="button" @click="$emit('download')">
-            <span>{{ t('downloadAsMD') }}</span>
+            <span>{{ t('NavigationBar.downloadAsMD') }}</span>
           </li>
 
           <li role="button" @click="$emit('export')">
-            <span>{{ t('exportAsPDF') }}</span>
+            <span>{{ t('NavigationBar.exportAsPDF') }}</span>
           </li>
         </ul>
       </li>
@@ -86,23 +86,6 @@ export default defineComponent({
   },
 })
 </script>
-
-<i18n>
-{
-  "be": {
-    "downloadAsMD": "Spampavać jak Markdown",
-    "exportAsPDF": "Ekspartavać jak PDF",
-    "file": "Fajł",
-    "open": "Adkryć Markdown fajł"
-  },
-  "en": {
-    "downloadAsMD": "Download as Markdown",
-    "exportAsPDF": "Export as PDF",
-    "file": "File",
-    "open": "Open Markdown file"
-  }
-}
-</i18n>
 
 <style lang="scss" scoped>
 .navigation-bar {

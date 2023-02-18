@@ -520,25 +520,27 @@ export default defineComponent({
           action: () => toggleHeading(codeMirror),
           className: 'fa fa-header',
           name: 'heading',
-          tooltip: `${t('heading')} (${shortcuts.toggleHeading})`,
+          tooltip: `${t('MarkdownEditor.heading')} (${
+            shortcuts.toggleHeading
+          })`,
         },
         {
           action: () => toggleBold(codeMirror),
           className: 'fa fa-bold',
           name: 'bold',
-          tooltip: `${t('bold')} (${shortcuts.toggleBold})`,
+          tooltip: `${t('MarkdownEditor.bold')} (${shortcuts.toggleBold})`,
         },
         {
           action: () => toggleItalic(codeMirror),
           className: 'fa fa-italic',
           name: 'italic',
-          tooltip: `${t('italic')} (${shortcuts.toggleItalic})`,
+          tooltip: `${t('MarkdownEditor.italic')} (${shortcuts.toggleItalic})`,
         },
         {
           action: () => toggleStrikethrough(codeMirror),
           className: 'fa fa-strikethrough',
           name: 'strikethrough',
-          tooltip: t('strikethrough'),
+          tooltip: t('MarkdownEditor.strikethrough'),
         },
       ],
       [
@@ -546,19 +548,25 @@ export default defineComponent({
           action: () => toggleOrderedList(codeMirror),
           className: 'fa fa-list-ol',
           name: 'orderedList',
-          tooltip: `${t('orderedList')} (${shortcuts.toggleOrderedList})`,
+          tooltip: `${t('MarkdownEditor.orderedList')} (${
+            shortcuts.toggleOrderedList
+          })`,
         },
         {
           action: () => toggleUnorderedList(codeMirror),
           className: 'fa fa-list-ul',
           name: 'unorderedList',
-          tooltip: `${t('unorderedList')} (${shortcuts.toggleUnorderedList})`,
+          tooltip: `${t('MarkdownEditor.unorderedList')} (${
+            shortcuts.toggleUnorderedList
+          })`,
         },
         {
           action: () => toggleBlockquote(codeMirror),
           className: 'fa fa-quote-right',
           name: 'quote',
-          tooltip: `${t('quote')} (${shortcuts.toggleBlockquote})`,
+          tooltip: `${t('MarkdownEditor.quote')} (${
+            shortcuts.toggleBlockquote
+          })`,
         },
       ],
       [
@@ -566,25 +574,27 @@ export default defineComponent({
           action: () => insertLink(codeMirror),
           className: 'fa fa-link',
           name: 'link',
-          tooltip: `${t('link')} (${shortcuts.insertLink})`,
+          tooltip: `${t('MarkdownEditor.link')} (${shortcuts.insertLink})`,
         },
         {
           action: () => insertImage(codeMirror),
           className: 'fa fa-image',
           name: 'image',
-          tooltip: `${t('image')} (${shortcuts.insertImage})`,
+          tooltip: `${t('MarkdownEditor.image')} (${shortcuts.insertImage})`,
         },
         {
           action: () => insertTable(codeMirror),
           className: 'fa fa-table',
           name: 'table',
-          tooltip: `${t('table')} (${shortcuts.insertImage})`,
+          tooltip: `${t('MarkdownEditor.table')} (${shortcuts.insertImage})`,
         },
         {
           action: () => insertHorizontalRule(codeMirror),
           className: 'fa fa-minus',
           name: 'horizontalRule',
-          tooltip: `${t('horizontalRule')} (${shortcuts.insertImage})`,
+          tooltip: `${t('MarkdownEditor.horizontalRule')} (${
+            shortcuts.insertImage
+          })`,
         },
       ],
       [
@@ -592,7 +602,9 @@ export default defineComponent({
           action: () => cleanBlock(codeMirror),
           className: 'fa fa-eraser fa-clean-block',
           name: 'cleanBlock',
-          tooltip: `${t('cleanBlock')} (${shortcuts.cleanBlock})`,
+          tooltip: `${t('MarkdownEditor.cleanBlock')} (${
+            shortcuts.cleanBlock
+          })`,
         },
       ],
       [
@@ -600,13 +612,13 @@ export default defineComponent({
           action: () => undo(codeMirror),
           className: 'fa fa-rotate-left no-disable',
           name: 'undo',
-          tooltip: t('undo'),
+          tooltip: t('MarkdownEditor.undo'),
         },
         {
           action: () => redo(codeMirror),
           className: 'fa fa-rotate-right no-disable',
           name: 'redo',
-          tooltip: t('redo'),
+          tooltip: t('MarkdownEditor.redo'),
         },
       ],
     ])
@@ -619,43 +631,6 @@ export default defineComponent({
   },
 })
 </script>
-
-<i18n>
-{
-  "be": {
-    "bold": "Toŭsty",
-    "cleanBlock": "Ačyścić błok",
-    "heading": "Zahałovak",
-    "horizontalRule": "Ustavić haryzantalnuju liniju",
-    "image": "Ustavić vyjavu",
-    "italic": "Kursyŭny",
-    "link": "Ustavić spasyłku",
-    "orderedList": "Numaravany śpis",
-    "quote": "Cytata",
-    "redo": "Paŭtaryć",
-    "strikethrough": "Zakreśleny",
-    "table": "Ustavić tablicu",
-    "undo": "Admianić",
-    "unorderedList": "Markavany śpis"
-  },
-  "en": {
-    "bold": "Bold",
-    "cleanBlock": "Clean Block",
-    "heading": "Heading",
-    "horizontalRule": "Insert Horizontal Line",
-    "image": "Insert Image",
-    "italic": "Italic",
-    "link": "Insert Link",
-    "orderedList": "Numbered List",
-    "quote": "Quote",
-    "redo": "Redo",
-    "strikethrough": "Strikethrough",
-    "table": "Insert Table",
-    "undo": "Undo",
-    "unorderedList": "Bulleted List"
-  }
-}
-</i18n>
 
 <style lang="scss" scoped>
 .markdown-editor {

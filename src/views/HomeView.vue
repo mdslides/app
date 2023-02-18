@@ -14,7 +14,7 @@
 
     <div class="home-view__split">
       <MarkdownEditor
-        :placeholder="t('editorPlaceholder')"
+        :placeholder="t('MarkdownEditor.placeholder')"
         :value="contentOpened"
         @input="content = $event"
       />
@@ -121,17 +121,6 @@ export default defineComponent({
   },
 })
 </script>
-
-<i18n>
-{
-  "be": {
-    "editorPlaceholder": "Pačnicie nabirać tekst tut..."
-  },
-  "en": {
-    "editorPlaceholder": "Start typing here..."
-  }
-}
-</i18n>
 
 <style lang="scss" scoped>
 @import '@/styles/variables';

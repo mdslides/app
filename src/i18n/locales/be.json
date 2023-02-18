@@ -1,1 +1,25 @@
-{}
+{
+  "MarkdownEditor": {
+    "bold": "Toŭsty",
+    "cleanBlock": "Ačyścić błok",
+    "heading": "Zahałovak",
+    "horizontalRule": "Ustavić haryzantalnuju liniju",
+    "image": "Ustavić vyjavu",
+    "italic": "Kursyŭny",
+    "link": "Ustavić spasyłku",
+    "orderedList": "Numaravany śpis",
+    "placeholder": "Pačnicie nabirać tekst tut...",
+    "quote": "Cytata",
+    "redo": "Paŭtaryć",
+    "strikethrough": "Zakreśleny",
+    "table": "Ustavić tablicu",
+    "undo": "Admianić",
+    "unorderedList": "Markavany śpis"
+  },
+  "NavigationBar": {
+    "downloadAsMD": "Spampavać jak Markdown",
+    "exportAsPDF": "Ekspartavać jak PDF",
+    "file": "Fajł",
+    "open": "Adkryć Markdown fajł"
+  }
+}
