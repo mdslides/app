@@ -1,5 +1,5 @@
 <template>
-  <div id="slidesPreview" class="slides-preview">
+  <div :id="containerId" class="slides-preview">
     <template v-for="(slide, i) in slidesMarkup" :key="i">
       <div v-html="slide" class="slides-preview__slide" />
     </template>
@@ -7,9 +7,11 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import { marked } from 'marked'
 import { sanitize } from 'dompurify'
+
+import { previewContainerId } from '@/constants'
 
 const markedOptions: marked.MarkedOptions = {
   breaks: true,
@@ -24,11 +26,14 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const containerId = ref(previewContainerId)
+
     const slidesMarkup = computed(() => {
       return sanitize(marked(props.value, markedOptions)).split(/\n(?=<h[12])/)
     })
 
     return {
+      containerId,
       slidesMarkup,
     }
   },
