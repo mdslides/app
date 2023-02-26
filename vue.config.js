@@ -20,7 +20,7 @@ module.exports = defineConfig({
     msTileColor: '#fff',
     manifestOptions: {
       description: 'Markdown slides editor',
-      display: 'minimal-ui',
+      display: 'standalone',
       background_color: '#fff',
       scope: process.env.PUBLIC_PATH,
       start_url: process.env.PUBLIC_PATH,
