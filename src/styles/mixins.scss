@@ -34,7 +34,8 @@ $breakpoints: 0, $sm, $lg;
 
 @mixin media-breakpoint-only($breakpoint) {
   $min: breakpoint-min($breakpoint);
-  $max: breakpoint-next($breakpoint);
+  $next: breakpoint-next($breakpoint);
+  $max: breakpoint-max($next);
 
   @if $min != null and $max != null {
     @media (min-width: $min) and (max-width: $max) {
@@ -45,7 +46,7 @@ $breakpoints: 0, $sm, $lg;
       @content;
     }
   } @else if $min == null {
-    @include media-breakpoint-down($max) {
+    @include media-breakpoint-down($next) {
       @content;
     }
   }
