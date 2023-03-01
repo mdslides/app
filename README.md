@@ -1,24 +1,21 @@
-# mdslides
+# MdSlides
 
-## Project setup
-```
-npm install
-```
+![MdSlides - Banner](https://raw.githubusercontent.com/mdslides/.github/main/profile/banner.png)
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+**Goal Oriented.**
+MdSlides is designed to focus on the content rather than moving text blocks back and forth.
 
-### Compiles and minifies for production
-```
-npm run build
-```
+**Mobile First.**
+The device used does not affect the process of creating presentations, nor the final result.
 
-### Lints and fixes files
-```
-npm run lint
-```
+**Installable.**
+Even though it is a web application, it can be used offline or even installed.
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+**Accessible.**
+MdSlides requires no extra interaction other than writing down one's thoughts.
+
+**Secure.**
+Processing data is not stored in the application, but in the one's device/browser only.
+
+**Open Source.**
+The application development is community-driven. Contributions are welcome.
