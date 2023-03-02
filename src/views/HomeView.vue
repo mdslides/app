@@ -1,7 +1,7 @@
 <template>
   <div class="home-view">
-    <div class="home-view__header">
-      <a :href="appLogoLink">
+    <header class="home-view__header">
+      <a :href="appLogoLink" target="_blank">
         <AppLogo />
       </a>
 
@@ -10,7 +10,7 @@
         @export="handleExport"
         @upload="handleUpload"
       />
-    </div>
+    </header>
 
     <div class="home-view__split">
       <MarkdownEditor
