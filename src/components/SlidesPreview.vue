@@ -9,7 +9,7 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue'
 import { marked } from 'marked'
-import { sanitize } from 'dompurify'
+import sanitizeHtml from 'sanitize-html'
 
 import { previewContainerId } from '@/constants'
 
@@ -29,7 +29,9 @@ export default defineComponent({
     const containerId = ref(previewContainerId)
 
     const slidesMarkup = computed(() => {
-      return sanitize(marked(props.value, markedOptions)).split(/\n(?=<h[12])/)
+      return sanitizeHtml(marked.parse(props.value, markedOptions)).split(
+        /\n(?=<h[12])/
+      )
     })
 
     return {
@@ -41,10 +43,11 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+@use 'sass:math';
 @import '@/styles/variables';
 @import '@/styles/mixins';
 
-$slideRatio: 4 / 3;
+$slideRatio: math.div(4, 3);
 $slideSize: 0.25;
 $slideFont: 0.009;
 
@@ -56,7 +59,7 @@ $slideFont: 0.009;
   &__slide {
     padding: 20px;
     width: 100vw * $slideSize;
-    height: 100vw * $slideSize / $slideRatio;
+    height: math.div(100vw * $slideSize, $slideRatio);
     box-shadow: 0 0 0 1px var(--color-border);
     background-color: #fff;
     font-size: 100vw * $slideFont;
@@ -71,7 +74,7 @@ $slideFont: 0.009;
   @include media-breakpoint-up($lg) {
     &__slide {
       width: $lg * $slideSize;
-      height: $lg * $slideSize / $slideRatio;
+      height: math.div($lg * $slideSize, $slideRatio);
       font-size: $lg * $slideFont;
     }
   }

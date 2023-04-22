@@ -24,12 +24,12 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-@import '~@fontsource/mulish/400.css';
-@import '~@fontsource/mulish/500.css';
-@import '~@fontsource/mulish/700.css';
-@import '~@fortawesome/fontawesome-free/css/fontawesome.css';
-@import '~@fortawesome/fontawesome-free/css/solid.css';
-@import '~codemirror/lib/codemirror.css';
+@import '@fontsource/mulish/400.css';
+@import '@fontsource/mulish/500.css';
+@import '@fontsource/mulish/700.css';
+@import '@fortawesome/fontawesome-free/css/fontawesome.css';
+@import '@fortawesome/fontawesome-free/css/solid.css';
+@import 'codemirror/lib/codemirror.css';
 
 @import 'styles/theme';
 @import 'styles/codeMirror';
