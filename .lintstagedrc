@@ -1,0 +1,4 @@
+{
+  "*.{js,ts,vue}": ["npm run lint", "npm run format"],
+  "*.{css,scss,vue}": ["npm run format"]
+}
