@@ -5,13 +5,14 @@
         <a
           v-for="button in buttonGroup"
           :key="button.name"
-          :class="[button.className, { active: cursorTokens[button.name] }]"
+          v-html="button?.icon"
+          :class="{ active: cursorTokens[button.name] }"
           :title="button.tooltip"
           tabindex="-1"
           @click.prevent="button.action"
         />
 
-        <i class="separator">|</i>
+        <span class="separator">|</span>
       </template>
     </div>
   </div>
@@ -21,6 +22,21 @@
 import { computed, defineComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CodeMirror from 'codemirror'
+
+import datasetIcon from '@material-design-icons/svg/sharp/dataset.svg?raw'
+import formatBoldIcon from '@material-design-icons/svg/sharp/format_bold.svg?raw'
+import formatClearIcon from '@material-design-icons/svg/sharp/format_clear.svg?raw'
+import formatItalicIcon from '@material-design-icons/svg/sharp/format_italic.svg?raw'
+import formatListBulletedIcon from '@material-design-icons/svg/sharp/format_list_bulleted.svg?raw'
+import formatListNumberedIcon from '@material-design-icons/svg/sharp/format_list_numbered.svg?raw'
+import formatQuoteIcon from '@material-design-icons/svg/sharp/format_quote.svg?raw'
+import horizontalRuleIcon from '@material-design-icons/svg/sharp/horizontal_rule.svg?raw'
+import imageIcon from '@material-design-icons/svg/sharp/image.svg?raw'
+import linkIcon from '@material-design-icons/svg/sharp/link.svg?raw'
+import redoIcon from '@material-design-icons/svg/sharp/redo.svg?raw'
+import strikethroughIcon from '@material-design-icons/svg/sharp/strikethrough_s.svg?raw'
+import titleIcon from '@material-design-icons/svg/sharp/title.svg?raw'
+import undoIcon from '@material-design-icons/svg/sharp/undo.svg?raw'
 
 import 'codemirror/addon/display/placeholder'
 import 'codemirror/addon/edit/continuelist'
@@ -518,7 +534,7 @@ export default defineComponent({
       [
         {
           action: () => toggleHeading(codeMirror),
-          className: 'fa fa-header',
+          icon: titleIcon,
           name: 'heading',
           tooltip: `${t('MarkdownEditor.heading')} (${
             shortcuts.toggleHeading
@@ -526,19 +542,20 @@ export default defineComponent({
         },
         {
           action: () => toggleBold(codeMirror),
-          className: 'fa fa-bold',
+          icon: formatBoldIcon,
           name: 'bold',
           tooltip: `${t('MarkdownEditor.bold')} (${shortcuts.toggleBold})`,
         },
         {
           action: () => toggleItalic(codeMirror),
+          icon: formatItalicIcon,
           className: 'fa fa-italic',
           name: 'italic',
           tooltip: `${t('MarkdownEditor.italic')} (${shortcuts.toggleItalic})`,
         },
         {
           action: () => toggleStrikethrough(codeMirror),
-          className: 'fa fa-strikethrough',
+          icon: strikethroughIcon,
           name: 'strikethrough',
           tooltip: t('MarkdownEditor.strikethrough'),
         },
@@ -546,7 +563,7 @@ export default defineComponent({
       [
         {
           action: () => toggleOrderedList(codeMirror),
-          className: 'fa fa-list-ol',
+          icon: formatListBulletedIcon,
           name: 'orderedList',
           tooltip: `${t('MarkdownEditor.orderedList')} (${
             shortcuts.toggleOrderedList
@@ -554,7 +571,7 @@ export default defineComponent({
         },
         {
           action: () => toggleUnorderedList(codeMirror),
-          className: 'fa fa-list-ul',
+          icon: formatListNumberedIcon,
           name: 'unorderedList',
           tooltip: `${t('MarkdownEditor.unorderedList')} (${
             shortcuts.toggleUnorderedList
@@ -562,7 +579,7 @@ export default defineComponent({
         },
         {
           action: () => toggleBlockquote(codeMirror),
-          className: 'fa fa-quote-right',
+          icon: formatQuoteIcon,
           name: 'quote',
           tooltip: `${t('MarkdownEditor.quote')} (${
             shortcuts.toggleBlockquote
@@ -572,25 +589,25 @@ export default defineComponent({
       [
         {
           action: () => insertLink(codeMirror),
-          className: 'fa fa-link',
+          icon: linkIcon,
           name: 'link',
           tooltip: `${t('MarkdownEditor.link')} (${shortcuts.insertLink})`,
         },
         {
           action: () => insertImage(codeMirror),
-          className: 'fa fa-image',
+          icon: imageIcon,
           name: 'image',
           tooltip: `${t('MarkdownEditor.image')} (${shortcuts.insertImage})`,
         },
         {
           action: () => insertTable(codeMirror),
-          className: 'fa fa-table',
+          icon: datasetIcon,
           name: 'table',
           tooltip: `${t('MarkdownEditor.table')} (${shortcuts.insertImage})`,
         },
         {
           action: () => insertHorizontalRule(codeMirror),
-          className: 'fa fa-minus',
+          icon: horizontalRuleIcon,
           name: 'horizontalRule',
           tooltip: `${t('MarkdownEditor.horizontalRule')} (${
             shortcuts.insertImage
@@ -600,7 +617,7 @@ export default defineComponent({
       [
         {
           action: () => cleanBlock(codeMirror),
-          className: 'fa fa-eraser fa-clean-block',
+          icon: formatClearIcon,
           name: 'cleanBlock',
           tooltip: `${t('MarkdownEditor.cleanBlock')} (${
             shortcuts.cleanBlock
@@ -610,13 +627,13 @@ export default defineComponent({
       [
         {
           action: () => undo(codeMirror),
-          className: 'fa fa-rotate-left no-disable',
+          icon: undoIcon,
           name: 'undo',
           tooltip: t('MarkdownEditor.undo'),
         },
         {
           action: () => redo(codeMirror),
-          className: 'fa fa-rotate-right no-disable',
+          icon: redoIcon,
           name: 'redo',
           tooltip: t('MarkdownEditor.redo'),
         },
@@ -643,7 +660,6 @@ export default defineComponent({
     display: flex;
     gap: 4px;
     padding: 16px 0;
-    min-height: 69px;
     border-bottom: 1px solid var(--color-border);
     overflow: auto hidden;
     user-select: none;
@@ -655,10 +671,11 @@ export default defineComponent({
     }
 
     a {
-      display: block;
-      padding: 2px;
-      min-width: 36px;
-      height: 36px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-width: 32px;
+      height: 32px;
       border: 1px solid transparent;
       border-radius: 50%;
       text-align: center;
@@ -667,10 +684,6 @@ export default defineComponent({
       transition: border 0.1s;
       cursor: pointer;
 
-      &::before {
-        line-height: 30px;
-      }
-
       &:hover {
         border-color: var(--color-border);
       }
@@ -678,19 +691,22 @@ export default defineComponent({
       &.active {
         border-color: var(--color-text);
       }
+
+      :global(svg) {
+        width: 22px;
+        height: 22px;
+      }
     }
 
-    i {
-      &.separator {
-        display: inline-block;
-        margin: 0 8px;
-        width: 1px;
-        background-color: var(--color-border);
-        color: transparent;
+    .separator {
+      display: inline-block;
+      margin: 0 8px;
+      width: 1px;
+      background-color: var(--color-border);
+      color: transparent;
 
-        &:last-child {
-          display: none;
-        }
+      &:last-child {
+        display: none;
       }
     }
   }
