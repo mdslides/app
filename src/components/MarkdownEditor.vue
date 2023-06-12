@@ -562,19 +562,19 @@ export default defineComponent({
       ],
       [
         {
-          action: () => toggleOrderedList(codeMirror),
-          icon: formatListBulletedIcon,
-          name: 'orderedList',
-          tooltip: `${t('MarkdownEditor.orderedList')} (${
-            shortcuts.toggleOrderedList
-          })`,
-        },
-        {
           action: () => toggleUnorderedList(codeMirror),
-          icon: formatListNumberedIcon,
+          icon: formatListBulletedIcon,
           name: 'unorderedList',
           tooltip: `${t('MarkdownEditor.unorderedList')} (${
             shortcuts.toggleUnorderedList
+          })`,
+        },
+        {
+          action: () => toggleOrderedList(codeMirror),
+          icon: formatListNumberedIcon,
+          name: 'orderedList',
+          tooltip: `${t('MarkdownEditor.orderedList')} (${
+            shortcuts.toggleOrderedList
           })`,
         },
         {
