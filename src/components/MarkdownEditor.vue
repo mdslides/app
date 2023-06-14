@@ -2,14 +2,15 @@
   <div ref="container" class="markdown-editor">
     <div class="markdown-editor__toolbar">
       <template v-for="(buttonGroup, i) in toolbarButtons" :key="i">
-        <a
+        <button
           v-for="button in buttonGroup"
           :key="button.name"
           v-html="button?.icon"
           :class="{ active: cursorTokens[button.name] }"
+          :disabled="button.disabled"
           :title="button.tooltip"
           tabindex="-1"
-          @click.prevent="button.action"
+          @click="button.action"
         />
 
         <span class="separator">|</span>
@@ -461,7 +462,14 @@ export default defineComponent({
     const { t } = useI18n()
     const container = ref<HTMLDivElement>()
     const cursorTokens = ref<Record<string, boolean>>({})
+    const historySize = ref({ redo: 0, undo: 0 })
     let codeMirror: CodeMirror.Editor
+
+    const resetValue = () => {
+      codeMirror.setValue(props.value)
+      codeMirror.clearHistory()
+      historySize.value = codeMirror.historySize()
+    }
 
     onMounted(() => {
       if (!container.value) {
@@ -509,10 +517,11 @@ export default defineComponent({
 
       codeMirror.on('update', () => {
         emit('input', codeMirror.getValue())
+        historySize.value = codeMirror.historySize()
       })
 
       if (props.value) {
-        codeMirror.setValue(props.value)
+        resetValue()
       }
     })
 
@@ -523,12 +532,7 @@ export default defineComponent({
       }
     )
 
-    watch(
-      () => props.value,
-      () => {
-        codeMirror.setValue(props.value)
-      }
-    )
+    watch(() => props.value, resetValue)
 
     const toolbarButtons = computed(() => [
       [
@@ -627,12 +631,14 @@ export default defineComponent({
       [
         {
           action: () => undo(codeMirror),
+          disabled: !historySize.value.undo,
           icon: undoIcon,
           name: 'undo',
           tooltip: t('MarkdownEditor.undo'),
         },
         {
           action: () => redo(codeMirror),
+          disabled: !historySize.value.redo,
           icon: redoIcon,
           name: 'redo',
           tooltip: t('MarkdownEditor.redo'),
@@ -649,7 +655,7 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .markdown-editor {
   display: flex;
   flex-direction: column;
@@ -658,8 +664,10 @@ export default defineComponent({
   &__toolbar {
     position: relative;
     display: flex;
+    align-items: center;
     gap: 4px;
     padding: 16px 0;
+    min-height: 65px;
     border-bottom: 1px solid var(--color-border);
     overflow: auto hidden;
     user-select: none;
@@ -670,31 +678,43 @@ export default defineComponent({
       flex: 0 0 16px;
     }
 
-    a {
+    button {
       display: flex;
       justify-content: center;
       align-items: center;
+      padding: 0;
       min-width: 32px;
       height: 32px;
       border: 1px solid transparent;
       border-radius: 50%;
-      text-align: center;
-      text-decoration: none;
+      background-color: transparent;
       color: var(--color-text);
       transition: border 0.1s;
       cursor: pointer;
 
-      &:hover {
-        border-color: var(--color-border);
+      &:disabled {
+        cursor: default;
+        pointer-events: none;
+
+        svg {
+          fill: var(--color-border);
+        }
       }
 
-      &.active {
-        border-color: var(--color-text);
+      &:not(:disabled) {
+        &:hover {
+          border-color: var(--color-border);
+        }
+
+        &.active {
+          border-color: var(--color-text);
+        }
       }
 
-      :global(svg) {
+      svg {
         width: 22px;
         height: 22px;
+        fill: var(--color-text);
       }
     }
 
