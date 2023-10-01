@@ -33,9 +33,7 @@ import formatListNumberedIcon from '@material-design-icons/svg/sharp/format_list
 import formatQuoteIcon from '@material-design-icons/svg/sharp/format_quote.svg?raw'
 import horizontalRuleIcon from '@material-design-icons/svg/sharp/horizontal_rule.svg?raw'
 import imageIcon from '@material-design-icons/svg/sharp/image.svg?raw'
-import linkIcon from '@material-design-icons/svg/sharp/link.svg?raw'
 import redoIcon from '@material-design-icons/svg/sharp/redo.svg?raw'
-import strikethroughIcon from '@material-design-icons/svg/sharp/strikethrough_s.svg?raw'
 import titleIcon from '@material-design-icons/svg/sharp/title.svg?raw'
 import undoIcon from '@material-design-icons/svg/sharp/undo.svg?raw'
 
@@ -69,11 +67,9 @@ const codeMirrorOptions: CodeMirror.EditorConfiguration = {
 const blockStyles = {
   bold: '**',
   italic: '*',
-  strikethrough: '~~',
 }
 
 const insertionTemplates = {
-  link: ['[', '](#url#)'],
   image: ['![](', '#url#)'],
   table: [
     '',
@@ -86,7 +82,6 @@ const shortcuts = isMac
   ? {
       cleanBlock: '⌘-E',
       insertImage: '⌘-⌥-I',
-      insertLink: '⌘-K',
       toggleBlockquote: "⌘-'",
       toggleBold: '⌘-B',
       toggleHeading: '⌘-H',
@@ -97,7 +92,6 @@ const shortcuts = isMac
   : {
       cleanBlock: 'Ctrl-E',
       insertImage: 'Ctrl-Alt-I',
-      insertLink: 'Ctrl-K',
       toggleBlockquote: "Ctrl-'",
       toggleBold: 'Ctrl-B',
       toggleHeading: 'Ctrl-H',
@@ -135,14 +129,8 @@ const getCursorTokens = (codeMirror: CodeMirror.Editor) => {
       case 'header-6':
         tokens[type.replace('header', 'heading')] = true
         break
-      case 'link':
-        tokens.link = true
-        break
       case 'quote':
         tokens.quote = true
-        break
-      case 'strikethrough':
-        tokens.strikethrough = true
         break
       case 'strong':
         tokens.bold = true
@@ -171,10 +159,6 @@ const toggleItalic = (codeMirror: CodeMirror.Editor) => {
   _toggleBlock(codeMirror, 'italic', blockStyles.italic)
 }
 
-const toggleStrikethrough = (codeMirror: CodeMirror.Editor) => {
-  _toggleBlock(codeMirror, 'strikethrough', blockStyles.strikethrough)
-}
-
 const toggleBlockquote = (codeMirror: CodeMirror.Editor) => {
   _toggleLine(codeMirror, 'quote')
 }
@@ -193,16 +177,6 @@ const toggleOrderedList = (codeMirror: CodeMirror.Editor) => {
 
 const cleanBlock = (codeMirror: CodeMirror.Editor) => {
   _cleanBlock(codeMirror)
-}
-
-const insertLink = (codeMirror: CodeMirror.Editor) => {
-  const cursorTokens = getCursorTokens(codeMirror)
-  _replaceSelection(
-    codeMirror,
-    cursorTokens.link,
-    insertionTemplates.link,
-    defaultUrl
-  )
 }
 
 const insertImage = (codeMirror: CodeMirror.Editor) => {
@@ -353,7 +327,7 @@ const _toggleLine = (
 
 const _toggleBlock = (
   codeMirror: CodeMirror.Editor,
-  type: 'bold' | 'italic' | 'strikethrough',
+  type: 'bold' | 'italic',
   startChars: string,
   endChars: string = startChars
 ) => {
@@ -373,9 +347,6 @@ const _toggleBlock = (
     } else if (type == 'italic') {
       start = start.replace(/(\*|_)(?![\s\S]*(\*|_))/, '')
       end = end.replace(/(\*|_)/, '')
-    } else if (type == 'strikethrough') {
-      start = start.replace(/(\*\*|~~)(?![\s\S]*(\*\*|~~))/, '')
-      end = end.replace(/(\*\*|~~)/, '')
     }
 
     codeMirror.replaceRange(
@@ -390,7 +361,7 @@ const _toggleBlock = (
       }
     )
 
-    if (type == 'bold' || type == 'strikethrough') {
+    if (type == 'bold') {
       startPoint.ch -= 2
       if (startPoint !== endPoint) {
         endPoint.ch -= 2
@@ -410,8 +381,6 @@ const _toggleBlock = (
     } else if (type == 'italic') {
       text = text.split('*').join('')
       text = text.split('_').join('')
-    } else if (type == 'strikethrough') {
-      text = text.split('~~').join('')
     }
 
     codeMirror.replaceSelection(start + text + end)
@@ -486,7 +455,6 @@ export default defineComponent({
       > = {
         cleanBlock,
         insertImage,
-        insertLink,
         toggleBlockquote,
         toggleBold,
         toggleHeading,
@@ -557,12 +525,6 @@ export default defineComponent({
           name: 'italic',
           tooltip: `${t('MarkdownEditor.italic')} (${shortcuts.toggleItalic})`,
         },
-        {
-          action: () => toggleStrikethrough(codeMirror),
-          icon: strikethroughIcon,
-          name: 'strikethrough',
-          tooltip: t('MarkdownEditor.strikethrough'),
-        },
       ],
       [
         {
@@ -591,12 +553,6 @@ export default defineComponent({
         },
       ],
       [
-        {
-          action: () => insertLink(codeMirror),
-          icon: linkIcon,
-          name: 'link',
-          tooltip: `${t('MarkdownEditor.link')} (${shortcuts.insertLink})`,
-        },
         {
           action: () => insertImage(codeMirror),
           icon: imageIcon,

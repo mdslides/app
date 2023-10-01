@@ -6,12 +6,10 @@
     "horizontalRule": "Insert Horizontal Line",
     "image": "Insert Image",
     "italic": "Italic",
-    "link": "Insert Link",
     "orderedList": "Numbered List",
     "placeholder": "Start typing here...",
     "quote": "Quote",
     "redo": "Redo",
-    "strikethrough": "Strikethrough",
     "table": "Insert Table",
     "undo": "Undo",
     "unorderedList": "Bulleted List"
