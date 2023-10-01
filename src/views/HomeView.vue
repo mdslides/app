@@ -16,7 +16,7 @@
       <MarkdownEditor
         :placeholder="t('MarkdownEditor.placeholder')"
         :value="contentOpened"
-        @input="content = $event"
+        @input="handleEditorInput"
       />
 
       <SlidesPreview :value="content" />
@@ -64,6 +64,10 @@ export default defineComponent({
         // ignore
       }
     }
+
+    const handleEditorInput = debounce((value: string) => {
+      content.value = value
+    }, 100)
 
     const handleExport = async () => {
       try {
@@ -114,6 +118,7 @@ export default defineComponent({
       content,
       contentOpened,
       handleDownload,
+      handleEditorInput,
       handleExport,
       handleUpload,
       t,
