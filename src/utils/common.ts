@@ -1,5 +1,16 @@
 let isLocalStorageAvailableCached: boolean
 
+export const getTitle = (value: string) => {
+  return value
+    .split(/\n/)
+    .find((x) => /^# \.*/.test(x.trim()))
+    ?.replace(/\s+/g, '-')
+    .replace(/[^\w-]+/g, '')
+    .replace(/--+/g, '-')
+    .replace(/^-+/, '')
+    .replace(/-+$/, '')
+}
+
 export const isLocalStorageAvailable = () => {
   if (isLocalStorageAvailableCached !== undefined) {
     return isLocalStorageAvailableCached

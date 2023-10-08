@@ -31,7 +31,7 @@ import { debounce } from 'lodash'
 import { fileOpen, fileSave } from 'browser-fs-access'
 
 import { previewContainerId } from '@/constants'
-import { createPdf, isLocalStorageAvailable } from '@/utils'
+import { createPdf, getTitle, isLocalStorageAvailable } from '@/utils'
 import AppLogo from '../components/AppLogo.vue'
 import MarkdownEditor from '../components/MarkdownEditor.vue'
 import NavigationBar from '../components/NavigationBar.vue'
@@ -59,6 +59,7 @@ export default defineComponent({
 
         await fileSave(blob, {
           extensions: ['.md'],
+          fileName: getTitle(content.value),
         })
       } catch {
         // ignore
@@ -74,7 +75,9 @@ export default defineComponent({
         const slidesContainer = document.getElementById(previewContainerId)
         if (slidesContainer?.children.length) {
           const blob = await createPdf(slidesContainer.children)
-          await fileSave(blob)
+          await fileSave(blob, {
+            fileName: getTitle(content.value),
+          })
         }
       } catch {
         // ignore
