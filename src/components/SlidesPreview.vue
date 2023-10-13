@@ -18,6 +18,11 @@ const markedOptions: marked.MarkedOptions = {
   gfm: true,
 }
 
+const sanitizeHtmlOptions = {
+  allowedSchemes: sanitizeHtml.defaults.allowedSchemes.concat(['data']),
+  allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+}
+
 export default defineComponent({
   props: {
     value: {
@@ -29,9 +34,10 @@ export default defineComponent({
     const containerId = ref(previewContainerId)
 
     const slidesMarkup = computed(() => {
-      return sanitizeHtml(marked.parse(props.value, markedOptions)).split(
-        /\n(?=<h[12])/
-      )
+      return sanitizeHtml(
+        marked.parse(props.value, markedOptions),
+        sanitizeHtmlOptions
+      ).split(/\n(?=<h[12])/)
     })
 
     return {
