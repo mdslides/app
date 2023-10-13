@@ -1,7 +1,7 @@
 <template>
   <div :id="containerId" class="slides-preview">
     <template v-for="(slide, i) in slidesMarkup" :key="i">
-      <div v-html="slide" class="slides-preview__slide" />
+      <div v-html="slide" class="slides-preview__slide slide-typography" />
     </template>
   </div>
 </template>
@@ -57,13 +57,10 @@ $slideFont: 0.009;
   overflow: auto;
 
   &__slide {
-    padding: 20px;
     width: 100vw * $slideSize;
     height: math.div(100vw * $slideSize, $slideRatio);
     box-shadow: 0 0 0 1px var(--color-border);
-    background-color: #fff;
     font-size: 100vw * $slideFont;
-    color: #000;
     overflow: hidden;
 
     & + * {

@@ -31,6 +31,7 @@ export default defineComponent({
 
 @import 'styles/theme';
 @import 'styles/codeMirror';
+@import 'styles/slideTypography';
 
 ::selection {
   background-color: var(--color-selection);
