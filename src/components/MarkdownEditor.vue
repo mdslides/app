@@ -24,17 +24,17 @@ import { computed, defineComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CodeMirror from 'codemirror'
 
-import datasetIcon from '@material-design-icons/svg/sharp/dataset.svg?raw'
 import formatBoldIcon from '@material-design-icons/svg/sharp/format_bold.svg?raw'
 import formatClearIcon from '@material-design-icons/svg/sharp/format_clear.svg?raw'
 import formatItalicIcon from '@material-design-icons/svg/sharp/format_italic.svg?raw'
 import formatListBulletedIcon from '@material-design-icons/svg/sharp/format_list_bulleted.svg?raw'
 import formatListNumberedIcon from '@material-design-icons/svg/sharp/format_list_numbered.svg?raw'
 import formatQuoteIcon from '@material-design-icons/svg/sharp/format_quote.svg?raw'
-import horizontalRuleIcon from '@material-design-icons/svg/sharp/horizontal_rule.svg?raw'
 import imageIcon from '@material-design-icons/svg/sharp/image.svg?raw'
+import indeterminateCheckBoxIcon from '@material-design-icons/svg/sharp/indeterminate_check_box.svg?raw'
+import listAltIcon from '@material-design-icons/svg/sharp/list_alt.svg?raw'
 import redoIcon from '@material-design-icons/svg/sharp/redo.svg?raw'
-import titleIcon from '@material-design-icons/svg/sharp/title.svg?raw'
+import textFieldsIcon from '@material-design-icons/svg/sharp/text_fields.svg?raw'
 import undoIcon from '@material-design-icons/svg/sharp/undo.svg?raw'
 
 import 'codemirror/addon/display/placeholder'
@@ -506,7 +506,7 @@ export default defineComponent({
       [
         {
           action: () => toggleHeading(codeMirror),
-          icon: titleIcon,
+          icon: textFieldsIcon,
           name: 'heading',
           tooltip: `${t('MarkdownEditor.heading')} (${
             shortcuts.toggleHeading
@@ -561,13 +561,13 @@ export default defineComponent({
         },
         {
           action: () => insertTable(codeMirror),
-          icon: datasetIcon,
+          icon: listAltIcon,
           name: 'table',
           tooltip: `${t('MarkdownEditor.table')} (${shortcuts.insertImage})`,
         },
         {
           action: () => insertHorizontalRule(codeMirror),
-          icon: horizontalRuleIcon,
+          icon: indeterminateCheckBoxIcon,
           name: 'horizontalRule',
           tooltip: `${t('MarkdownEditor.horizontalRule')} (${
             shortcuts.insertImage
