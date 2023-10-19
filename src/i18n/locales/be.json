@@ -1,18 +1,21 @@
 {
   "MarkdownEditor": {
-    "bold": "Toŭsty",
-    "cleanBlock": "Vydalić farmatavańnie",
-    "heading": "Zahałovak",
-    "horizontalRule": "Ustavić haryzantalnuju liniju",
-    "image": "Ustavić vyjavu",
-    "italic": "Kursyŭny",
-    "orderedList": "Numaravany śpis",
-    "placeholder": "Pačnicie nabirać tekst tut...",
-    "quote": "Cytata",
-    "redo": "Paŭtaryć",
-    "table": "Ustavić tablicu",
-    "undo": "Admianić",
-    "unorderedList": "Markavany śpis"
+    "Commands": {
+      "blockquote": "Cytata",
+      "bold": "Toŭsty",
+      "clean": "Vydalić farmatavańnie",
+      "heading": "Zahałovak",
+      "hr": "Ustavić haryzantalnuju liniju",
+      "image": "Ustavić vyjavu",
+      "italic": "Kursyŭny",
+      "ol": "Numaravany śpis",
+      "redo": "Paŭtaryć",
+      "table": "Ustavić tablicu",
+      "ul": "Markavany śpis",
+      "undo": "Admianić"
+    },
+
+    "placeholder": "Pačnicie nabirać tekst tut..."
   },
   "NavigationBar": {
     "downloadAsMD": "Spampavać jak Markdown",

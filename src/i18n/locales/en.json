@@ -1,18 +1,20 @@
 {
   "MarkdownEditor": {
-    "bold": "Bold",
-    "cleanBlock": "Clear Formatting",
-    "heading": "Heading",
-    "horizontalRule": "Insert Horizontal Line",
-    "image": "Insert Image",
-    "italic": "Italic",
-    "orderedList": "Numbered List",
-    "placeholder": "Start typing here...",
-    "quote": "Quote",
-    "redo": "Redo",
-    "table": "Insert Table",
-    "undo": "Undo",
-    "unorderedList": "Bulleted List"
+    "Commands": {
+      "blockquote": "Quote",
+      "bold": "Bold",
+      "clean": "Clear Formatting",
+      "heading": "Heading",
+      "hr": "Insert Horizontal Line",
+      "image": "Insert Image",
+      "italic": "Italic",
+      "ol": "Numbered List",
+      "redo": "Redo",
+      "table": "Insert Table",
+      "ul": "Bulleted List",
+      "undo": "Undo"
+    },
+    "placeholder": "Start typing here..."
   },
   "NavigationBar": {
     "downloadAsMD": "Download as Markdown",

@@ -11,10 +11,14 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@codemirror/commands": "^6.3.0",
+    "@codemirror/lang-markdown": "^6.2.2",
+    "@codemirror/language": "^6.9.1",
+    "@codemirror/state": "^6.3.0",
+    "@codemirror/view": "^6.21.3",
     "@fontsource/mulish": "^4.5.13",
     "@material-design-icons/svg": "^0.14.7",
     "browser-fs-access": "^0.31.1",
-    "codemirror": "^5.65.7",
     "dom-to-svg": "^0.12.2",
     "jspdf": "^2.5.1",
     "lodash": "^4.17.21",
@@ -26,7 +30,6 @@
   },
   "devDependencies": {
     "@rushstack/eslint-patch": "^1.2.0",
-    "@types/codemirror": "^5.60.5",
     "@types/lodash": "^4.14.182",
     "@types/marked": "^4.0.3",
     "@types/node": "^18.15.11",

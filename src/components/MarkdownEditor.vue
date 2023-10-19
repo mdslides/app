@@ -5,9 +5,9 @@
         <button
           v-for="button in buttonGroup"
           :key="button.name"
-          v-html="button?.icon"
-          :class="{ active: cursorTokens[button.name] }"
-          :disabled="button.disabled"
+          v-html="button.icon"
+          :class="{ active: activeButtons[button.name] }"
+          :disabled="disabledButtons[button.name]"
           :title="button.tooltip"
           tabindex="-1"
           @click="button.action"
@@ -22,7 +22,22 @@
 <script lang="ts">
 import { computed, defineComponent, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import CodeMirror from 'codemirror'
+import {
+  EditorView,
+  keymap,
+  placeholder,
+  type KeyBinding,
+} from '@codemirror/view'
+import { EditorState } from '@codemirror/state'
+import {
+  defaultKeymap,
+  history,
+  historyKeymap,
+  redoDepth,
+  undoDepth,
+} from '@codemirror/commands'
+import { defaultHighlightStyle, syntaxHighlighting } from '@codemirror/language'
+import { markdown, markdownKeymap } from '@codemirror/lang-markdown'
 
 import formatBoldIcon from '@material-design-icons/svg/sharp/format_bold.svg?raw'
 import formatClearIcon from '@material-design-icons/svg/sharp/format_clear.svg?raw'
@@ -37,383 +52,63 @@ import redoIcon from '@material-design-icons/svg/sharp/redo.svg?raw'
 import textFieldsIcon from '@material-design-icons/svg/sharp/text_fields.svg?raw'
 import undoIcon from '@material-design-icons/svg/sharp/undo.svg?raw'
 
-import 'codemirror/addon/display/placeholder'
-import 'codemirror/addon/edit/continuelist'
-import 'codemirror/addon/selection/mark-selection'
-import 'codemirror/mode/gfm/gfm'
-import 'codemirror/mode/markdown/markdown'
-import 'codemirror/mode/xml/xml'
+import {
+  editorCommands,
+  getActiveCommands,
+  isMac,
+  type EditorCommand,
+} from '@/utils'
 
-import { isMac } from '@/utils'
+const commandGroups: EditorCommand[][] = [
+  ['heading', 'bold', 'italic'],
+  ['ul', 'ol', 'blockquote'],
+  ['image', 'table', 'hr'],
+  ['clean'],
+  ['undo', 'redo'],
+]
 
-const defaultUrl = 'http://'
-
-const codeMirrorOptions: CodeMirror.EditorConfiguration = {
-  autofocus: false,
-  indentUnit: 2,
-  indentWithTabs: true,
-  lineNumbers: false,
-  lineWrapping: true,
-  mode: {
-    gitHubSpice: false,
-    highlightFormatting: true,
-    name: 'gfm',
-  },
-  styleSelectedText: true,
-  tabSize: 2,
-  theme: 'paper',
+const commandIcons: Record<EditorCommand, string> = {
+  blockquote: formatQuoteIcon,
+  bold: formatBoldIcon,
+  clean: formatClearIcon,
+  heading: textFieldsIcon,
+  hr: indeterminateCheckBoxIcon,
+  image: imageIcon,
+  italic: formatItalicIcon,
+  ol: formatListNumberedIcon,
+  redo: redoIcon,
+  table: listAltIcon,
+  ul: formatListBulletedIcon,
+  undo: undoIcon,
 }
 
-const blockStyles = {
-  bold: '**',
-  italic: '*',
+const commandKeys: Partial<Record<EditorCommand, string>> = {
+  blockquote: "Mod-'",
+  bold: 'Mod-b',
+  clean: 'Mod-e',
+  heading: 'Mod-h',
+  image: 'Mod-Alt-i',
+  italic: 'Mod-i',
+  ol: 'Mod-Alt-l',
+  ul: 'Mod-l',
 }
 
-const insertionTemplates = {
-  image: ['![](', '#url#)'],
-  table: [
-    '',
-    '\n\n| Column 1 | Column 2 | Column 3 |\n| -------- | -------- | -------- |\n| Text     | Text     | Text     |\n\n',
-  ],
-  horizontalRule: ['', '\n\n---\n\n'],
-}
+const commandKeysLocalized = Object.entries(commandKeys).reduce(
+  (acc, [command, key]) => ({
+    ...acc,
+    [command]: isMac
+      ? key.toUpperCase().replace('MOD-', '⌘-').replace('ALT-', '⌥-')
+      : key.toUpperCase().replace('MOD-', 'Ctrl-').replace('ALT-', 'Alt-'),
+  }),
+  commandKeys
+)
 
-const shortcuts = isMac
-  ? {
-      cleanBlock: '⌘-E',
-      insertImage: '⌘-⌥-I',
-      toggleBlockquote: "⌘-'",
-      toggleBold: '⌘-B',
-      toggleHeading: '⌘-H',
-      toggleItalic: '⌘-I',
-      toggleOrderedList: '⌘-⌥-L',
-      toggleUnorderedList: '⌘-L',
-    }
-  : {
-      cleanBlock: 'Ctrl-E',
-      insertImage: 'Ctrl-Alt-I',
-      toggleBlockquote: "Ctrl-'",
-      toggleBold: 'Ctrl-B',
-      toggleHeading: 'Ctrl-H',
-      toggleItalic: 'Ctrl-I',
-      toggleOrderedList: 'Ctrl-Alt-L',
-      toggleUnorderedList: 'Ctrl-L',
-    }
-
-const getCursorTokens = (codeMirror: CodeMirror.Editor) => {
-  const position = codeMirror.getCursor('start')
-  const token = codeMirror.getTokenAt(position)
-  const tokens: Record<string, boolean> = {}
-
-  if (!token.type) {
-    return tokens
-  }
-
-  for (const type of token.type.split(' ')) {
-    switch (type) {
-      case 'atom':
-        tokens.quote = true
-        break
-      case 'comment':
-        tokens.code = true
-        break
-      case 'em':
-        tokens.italic = true
-        break
-      case 'header':
-      case 'header-1':
-      case 'header-2':
-      case 'header-3':
-      case 'header-4':
-      case 'header-5':
-      case 'header-6':
-        tokens[type.replace('header', 'heading')] = true
-        break
-      case 'quote':
-        tokens.quote = true
-        break
-      case 'strong':
-        tokens.bold = true
-        break
-      case 'tag':
-        tokens.image = true
-        break
-      case 'variable-2':
-        if (/^\s*\d+\.\s/.test(codeMirror.getLine(position.line))) {
-          tokens.orderedList = true
-        } else {
-          tokens.unorderedList = true
-        }
-        break
-    }
-  }
-
-  return tokens
-}
-
-const toggleBold = (codeMirror: CodeMirror.Editor) => {
-  _toggleBlock(codeMirror, 'bold', blockStyles.bold)
-}
-
-const toggleItalic = (codeMirror: CodeMirror.Editor) => {
-  _toggleBlock(codeMirror, 'italic', blockStyles.italic)
-}
-
-const toggleBlockquote = (codeMirror: CodeMirror.Editor) => {
-  _toggleLine(codeMirror, 'quote')
-}
-
-const toggleHeading = (codeMirror: CodeMirror.Editor) => {
-  _toggleHeading(codeMirror)
-}
-
-const toggleUnorderedList = (codeMirror: CodeMirror.Editor) => {
-  _toggleLine(codeMirror, 'unordered-list')
-}
-
-const toggleOrderedList = (codeMirror: CodeMirror.Editor) => {
-  _toggleLine(codeMirror, 'ordered-list')
-}
-
-const cleanBlock = (codeMirror: CodeMirror.Editor) => {
-  _cleanBlock(codeMirror)
-}
-
-const insertImage = (codeMirror: CodeMirror.Editor) => {
-  const cursorTokens = getCursorTokens(codeMirror)
-  _replaceSelection(
-    codeMirror,
-    cursorTokens.image,
-    insertionTemplates.image,
-    defaultUrl
-  )
-}
-
-const insertTable = (codeMirror: CodeMirror.Editor) => {
-  const cursorTokens = getCursorTokens(codeMirror)
-  _replaceSelection(codeMirror, cursorTokens.table, insertionTemplates.table)
-}
-
-const insertHorizontalRule = (codeMirror: CodeMirror.Editor) => {
-  const cursorTokens = getCursorTokens(codeMirror)
-  _replaceSelection(
-    codeMirror,
-    cursorTokens.image,
-    insertionTemplates.horizontalRule
-  )
-}
-
-const undo = (codeMirror: CodeMirror.Editor) => {
-  codeMirror.undo()
-  codeMirror.focus()
-}
-
-const redo = (codeMirror: CodeMirror.Editor) => {
-  codeMirror.redo()
-  codeMirror.focus()
-}
-
-const _replaceSelection = (
-  codeMirror: CodeMirror.Editor,
-  isActive: boolean,
-  template: string[],
-  url?: string
-) => {
-  const startPoint = codeMirror.getCursor('start')
-  const endPoint = codeMirror.getCursor('end')
-  let [start, end] = template
-
-  if (url) {
-    end = end.replace('#url#', url)
-  }
-
-  if (isActive) {
-    const text = codeMirror.getLine(startPoint.line)
-    start = text.slice(0, startPoint.ch)
-    end = text.slice(startPoint.ch)
-    codeMirror.replaceRange(start + end, {
-      line: startPoint.line,
-      ch: 0,
-    })
-  } else {
-    const text = codeMirror.getSelection()
-    codeMirror.replaceSelection(start + text + end)
-    startPoint.ch += start.length
-    if (startPoint !== endPoint) {
-      endPoint.ch += start.length
-    }
-  }
-
-  codeMirror.setSelection(startPoint, endPoint)
-  codeMirror.focus()
-}
-
-const _toggleHeading = (codeMirror: CodeMirror.Editor) => {
-  const startPoint = codeMirror.getCursor('start')
-  const endPoint = codeMirror.getCursor('end')
-
-  for (let i = startPoint.line; i <= endPoint.line; i++) {
-    let text = codeMirror.getLine(i)
-    const currHeadingLevel = text.search(/[^#]/)
-
-    if (currHeadingLevel <= 0) {
-      text = '# ' + text
-    } else if (currHeadingLevel == 6) {
-      text = text.substr(7)
-    } else {
-      text = '#' + text
-    }
-
-    codeMirror.replaceRange(
-      text,
-      {
-        line: i,
-        ch: 0,
-      },
-      {
-        line: i,
-        ch: 99999999999999,
-      }
-    )
-  }
-
-  codeMirror.focus()
-}
-
-const _toggleLine = (
-  codeMirror: CodeMirror.Editor,
-  type: 'ordered-list' | 'quote' | 'unordered-list'
-) => {
-  const cursorTokens = getCursorTokens(codeMirror)
-  const startPoint = codeMirror.getCursor('start')
-  const endPoint = codeMirror.getCursor('end')
-
-  const patterns = {
-    'ordered-list': /^(\s*)\d+\.\s+/,
-    'unordered-list': /^(\s*)(\*|-|\+)\s+/,
-    quote: /^(\s*)>\s+/,
-  }
-
-  const map = {
-    'ordered-list': '1. ',
-    'unordered-list': '* ',
-    quote: '> ',
-  }
-
-  for (let i = startPoint.line; i <= endPoint.line; i++) {
-    let text = codeMirror.getLine(i)
-
-    if (cursorTokens[type]) {
-      text = text.replace(patterns[type], '$1')
-    } else {
-      text = map[type] + text
-    }
-
-    codeMirror.replaceRange(
-      text,
-      {
-        line: i,
-        ch: 0,
-      },
-      {
-        line: i,
-        ch: 99999999999999,
-      }
-    )
-  }
-
-  codeMirror.focus()
-}
-
-const _toggleBlock = (
-  codeMirror: CodeMirror.Editor,
-  type: 'bold' | 'italic',
-  startChars: string,
-  endChars: string = startChars
-) => {
-  const startPoint = codeMirror.getCursor('start')
-  const endPoint = codeMirror.getCursor('end')
-  let start = startChars
-  let end = endChars
-
-  if (getCursorTokens(codeMirror)[type]) {
-    let text = codeMirror.getLine(startPoint.line)
-    start = text.slice(0, startPoint.ch)
-    end = text.slice(startPoint.ch)
-
-    if (type == 'bold') {
-      start = start.replace(/(\*\*|__)(?![\s\S]*(\*\*|__))/, '')
-      end = end.replace(/(\*\*|__)/, '')
-    } else if (type == 'italic') {
-      start = start.replace(/(\*|_)(?![\s\S]*(\*|_))/, '')
-      end = end.replace(/(\*|_)/, '')
-    }
-
-    codeMirror.replaceRange(
-      start + end,
-      {
-        line: startPoint.line,
-        ch: 0,
-      },
-      {
-        line: startPoint.line,
-        ch: 99999999999999,
-      }
-    )
-
-    if (type == 'bold') {
-      startPoint.ch -= 2
-      if (startPoint !== endPoint) {
-        endPoint.ch -= 2
-      }
-    } else if (type == 'italic') {
-      startPoint.ch -= 1
-      if (startPoint !== endPoint) {
-        endPoint.ch -= 1
-      }
-    }
-  } else {
-    let text = codeMirror.getSelection()
-
-    if (type == 'bold') {
-      text = text.split('**').join('')
-      text = text.split('__').join('')
-    } else if (type == 'italic') {
-      text = text.split('*').join('')
-      text = text.split('_').join('')
-    }
-
-    codeMirror.replaceSelection(start + text + end)
-    startPoint.ch += startChars.length
-    endPoint.ch = startPoint.ch + text.length
-  }
-
-  codeMirror.setSelection(startPoint, endPoint)
-  codeMirror.focus()
-}
-
-const _cleanBlock = (codeMirror: CodeMirror.Editor) => {
-  const startPoint = codeMirror.getCursor('start')
-  const endPoint = codeMirror.getCursor('end')
-
-  for (let line = startPoint.line; line <= endPoint.line; line++) {
-    const text = codeMirror
-      .getLine(line)
-      .replace(/^[ ]*([# ]+|\*|-|[> ]+|[0-9]+(.|\)))[ ]*/, '')
-
-    codeMirror.replaceRange(
-      text,
-      {
-        line,
-        ch: 0,
-      },
-      {
-        line,
-        ch: 99999999999999,
-      }
-    )
-  }
-}
+const customKeymap: KeyBinding[] = Object.entries(commandKeys).map(
+  ([command, key]) => ({
+    key,
+    run: editorCommands[command as EditorCommand],
+  })
+)
 
 export default defineComponent({
   props: {
@@ -430,181 +125,74 @@ export default defineComponent({
   setup(props, { emit }) {
     const { t } = useI18n()
     const container = ref<HTMLDivElement>()
-    const cursorTokens = ref<Record<string, boolean>>({})
-    const historySize = ref({ redo: 0, undo: 0 })
-    let codeMirror: CodeMirror.Editor
+    const activeButtons = ref<Partial<Record<EditorCommand, boolean>>>({})
+    const disabledButtons = ref<Partial<Record<EditorCommand, boolean>>>({
+      redo: true,
+      undo: true,
+    })
+    let codeMirror: EditorView
 
-    const resetValue = () => {
-      codeMirror.setValue(props.value)
-      codeMirror.clearHistory()
-      historySize.value = codeMirror.historySize()
-    }
+    const extensions = [
+      EditorView.updateListener.of((update) => {
+        if (update.docChanged) {
+          disabledButtons.value.redo = !redoDepth(codeMirror.state)
+          disabledButtons.value.undo = !undoDepth(codeMirror.state)
+          emit('input', update.state.doc.toString())
+        }
+        if (update.selectionSet) {
+          activeButtons.value = getActiveCommands(codeMirror.state)
+        }
+      }),
+      history(),
+      markdown(),
+      placeholder(props.placeholder),
+      syntaxHighlighting(defaultHighlightStyle),
+      keymap.of([
+        ...customKeymap,
+        ...markdownKeymap,
+        ...historyKeymap,
+        ...defaultKeymap,
+      ]),
+    ]
 
     onMounted(() => {
-      if (!container.value) {
-        return
-      }
-
-      const extraKeys: CodeMirror.KeyMap = {
-        Enter: 'newlineAndIndentContinueMarkdownList',
-      }
-
-      const shortcutActions: Record<
-        keyof typeof shortcuts,
-        (codeMirror: CodeMirror.Editor) => void
-      > = {
-        cleanBlock,
-        insertImage,
-        toggleBlockquote,
-        toggleBold,
-        toggleHeading,
-        toggleItalic,
-        toggleOrderedList,
-        toggleUnorderedList,
-      }
-
-      for (const key in shortcuts) {
-        const keyTyped = key as keyof typeof shortcuts
-        const shortcut = shortcuts[keyTyped]
-          .replace('⌘', 'Cmd')
-          .replace('⌥', 'Alt')
-        extraKeys[shortcut] = () => {
-          shortcutActions[keyTyped](codeMirror)
-        }
-      }
-
-      codeMirror = CodeMirror(container.value, {
-        ...codeMirrorOptions,
-        extraKeys,
-        placeholder: props.placeholder,
+      codeMirror = new EditorView({
+        extensions,
+        parent: container.value,
       })
-
-      codeMirror.on('cursorActivity', () => {
-        cursorTokens.value = getCursorTokens(codeMirror)
-      })
-
-      codeMirror.on('update', () => {
-        emit('input', codeMirror.getValue())
-        historySize.value = codeMirror.historySize()
-      })
-
-      if (props.value) {
-        resetValue()
-      }
     })
 
     watch(
-      () => props.placeholder,
+      () => props.value,
       () => {
-        codeMirror.setOption('placeholder', props.placeholder)
+        codeMirror.setState(
+          EditorState.create({ doc: props.value, extensions })
+        )
       }
     )
 
-    watch(() => props.value, resetValue)
-
-    const toolbarButtons = computed(() => [
-      [
-        {
-          action: () => toggleHeading(codeMirror),
-          icon: textFieldsIcon,
-          name: 'heading',
-          tooltip: `${t('MarkdownEditor.heading')} (${
-            shortcuts.toggleHeading
-          })`,
-        },
-        {
-          action: () => toggleBold(codeMirror),
-          icon: formatBoldIcon,
-          name: 'bold',
-          tooltip: `${t('MarkdownEditor.bold')} (${shortcuts.toggleBold})`,
-        },
-        {
-          action: () => toggleItalic(codeMirror),
-          icon: formatItalicIcon,
-          className: 'fa fa-italic',
-          name: 'italic',
-          tooltip: `${t('MarkdownEditor.italic')} (${shortcuts.toggleItalic})`,
-        },
-      ],
-      [
-        {
-          action: () => toggleUnorderedList(codeMirror),
-          icon: formatListBulletedIcon,
-          name: 'unorderedList',
-          tooltip: `${t('MarkdownEditor.unorderedList')} (${
-            shortcuts.toggleUnorderedList
-          })`,
-        },
-        {
-          action: () => toggleOrderedList(codeMirror),
-          icon: formatListNumberedIcon,
-          name: 'orderedList',
-          tooltip: `${t('MarkdownEditor.orderedList')} (${
-            shortcuts.toggleOrderedList
-          })`,
-        },
-        {
-          action: () => toggleBlockquote(codeMirror),
-          icon: formatQuoteIcon,
-          name: 'quote',
-          tooltip: `${t('MarkdownEditor.quote')} (${
-            shortcuts.toggleBlockquote
-          })`,
-        },
-      ],
-      [
-        {
-          action: () => insertImage(codeMirror),
-          icon: imageIcon,
-          name: 'image',
-          tooltip: `${t('MarkdownEditor.image')} (${shortcuts.insertImage})`,
-        },
-        {
-          action: () => insertTable(codeMirror),
-          icon: listAltIcon,
-          name: 'table',
-          tooltip: `${t('MarkdownEditor.table')} (${shortcuts.insertImage})`,
-        },
-        {
-          action: () => insertHorizontalRule(codeMirror),
-          icon: indeterminateCheckBoxIcon,
-          name: 'horizontalRule',
-          tooltip: `${t('MarkdownEditor.horizontalRule')} (${
-            shortcuts.insertImage
-          })`,
-        },
-      ],
-      [
-        {
-          action: () => cleanBlock(codeMirror),
-          icon: formatClearIcon,
-          name: 'cleanBlock',
-          tooltip: `${t('MarkdownEditor.cleanBlock')} (${
-            shortcuts.cleanBlock
-          })`,
-        },
-      ],
-      [
-        {
-          action: () => undo(codeMirror),
-          disabled: !historySize.value.undo,
-          icon: undoIcon,
-          name: 'undo',
-          tooltip: t('MarkdownEditor.undo'),
-        },
-        {
-          action: () => redo(codeMirror),
-          disabled: !historySize.value.redo,
-          icon: redoIcon,
-          name: 'redo',
-          tooltip: t('MarkdownEditor.redo'),
-        },
-      ],
-    ])
+    const toolbarButtons = computed(() => {
+      return commandGroups.map((group) =>
+        group.map((command) => ({
+          action: () => {
+            editorCommands[command](codeMirror)
+            codeMirror.focus()
+          },
+          icon: commandIcons[command],
+          name: command,
+          tooltip:
+            t(`MarkdownEditor.Commands.${command}`) +
+            (commandKeysLocalized[command]
+              ? ` (${commandKeysLocalized[command]})`
+              : ''),
+        }))
+      )
+    })
 
     return {
+      activeButtons,
       container,
-      cursorTokens,
+      disabledButtons,
       toolbarButtons,
     }
   },

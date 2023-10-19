@@ -27,10 +27,8 @@ export default defineComponent({
 @import '@fontsource/mulish/400.css';
 @import '@fontsource/mulish/500.css';
 @import '@fontsource/mulish/700.css';
-@import 'codemirror/lib/codemirror.css';
 
 @import 'styles/theme';
-@import 'styles/codeMirror';
 @import 'styles/slideTypography';
 
 ::selection {

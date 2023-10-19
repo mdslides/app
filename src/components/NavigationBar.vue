@@ -36,7 +36,7 @@
           <template v-for="item in availableLocales">
             <li
               v-if="item !== locale"
-              :key="item as string"
+              :key="item"
               role="button"
               @click="locale = item"
             >

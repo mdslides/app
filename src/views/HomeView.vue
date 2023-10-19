@@ -91,10 +91,15 @@ export default defineComponent({
           extensions: ['.md'],
         })
 
-        contentOpened.value = await new Response(blob).text()
+        setContent(await new Response(blob).text())
       } catch {
         // ignore
       }
+    }
+
+    const setContent = (value: string) => {
+      content.value = value
+      contentOpened.value = value
     }
 
     const appLogoLink = computed(() => {
@@ -112,7 +117,7 @@ export default defineComponent({
 
     onMounted(() => {
       if (isLocalStorageAvailable()) {
-        contentOpened.value = localStorage.getItem(autosaveKey) ?? ''
+        setContent(localStorage.getItem(autosaveKey) ?? '')
       }
     })
 
