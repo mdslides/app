@@ -273,5 +273,9 @@ export default defineComponent({
       }
     }
   }
+
+  .cm-editor {
+    height: calc(100% - 65px);
+  }
 }
 </style>
