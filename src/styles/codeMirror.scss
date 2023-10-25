@@ -1,0 +1,27 @@
+.cm-editor {
+  height: calc(100% - 65px);
+  background-color: var(--color-background);
+  color: var(--color-text);
+
+  &.cm-focused {
+    outline: none;
+  }
+
+  .cm-content {
+    padding: 16px;
+  }
+
+  .cm-line {
+    padding: 0;
+  }
+
+  .cm-placeholder {
+    color: inherit;
+    opacity: 0.5;
+  }
+
+  .cm-scroller {
+    line-height: 1.5;
+    font-family: inherit;
+  }
+}

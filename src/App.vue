@@ -29,6 +29,7 @@ export default defineComponent({
 @import '@fontsource/mulish/700.css';
 
 @import 'styles/theme';
+@import 'styles/codeMirror';
 @import 'styles/slideTypography';
 
 ::selection {
@@ -48,6 +49,7 @@ body {
   margin: 0;
   padding: 0;
   background-color: var(--color-background);
+  line-height: 1;
   color: var(--color-text);
 }
 

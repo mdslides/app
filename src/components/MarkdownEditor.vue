@@ -36,7 +36,6 @@ import {
   redoDepth,
   undoDepth,
 } from '@codemirror/commands'
-import { defaultHighlightStyle, syntaxHighlighting } from '@codemirror/language'
 import { markdown, markdownKeymap } from '@codemirror/lang-markdown'
 
 import formatBoldIcon from '@material-design-icons/svg/sharp/format_bold.svg?raw'
@@ -133,6 +132,7 @@ export default defineComponent({
     let codeMirror: EditorView
 
     const extensions = [
+      EditorView.lineWrapping,
       EditorView.updateListener.of((update) => {
         if (update.docChanged) {
           disabledButtons.value.redo = !redoDepth(codeMirror.state)
@@ -146,7 +146,6 @@ export default defineComponent({
       history(),
       markdown(),
       placeholder(props.placeholder),
-      syntaxHighlighting(defaultHighlightStyle),
       keymap.of([
         ...customKeymap,
         ...markdownKeymap,

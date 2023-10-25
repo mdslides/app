@@ -4,13 +4,11 @@
   --color-background: #fff;
   --color-border: #ddd;
   --color-selection: rgba(180, 140, 240, 0.25);
-  --color-selection-inactive: rgba(220, 220, 220, 0.5);
   --color-text: #111;
 
   @include color-scheme-dark {
     --color-background: #111;
     --color-border: #444;
-    --color-selection-inactive: rgba(80, 80, 80, 0.5);
     --color-text: #fff;
   }
 }
