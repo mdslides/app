@@ -1,7 +1,8 @@
 import {
   EditorSelection,
-  EditorState,
   type ChangeSpec,
+  type EditorState,
+  type SelectionRange,
   type StateCommand,
   type TransactionSpec,
 } from '@codemirror/state'
@@ -22,6 +23,18 @@ export type EditorCommand =
   | 'table'
   | 'ul'
   | 'undo'
+
+const getAffectedLines = (state: EditorState, range: SelectionRange) => {
+  const lineFrom = state.doc.lineAt(range.from)
+  const lineTo = state.doc.lineAt(range.to)
+  const lines = [lineFrom]
+  if (lineFrom.number !== lineTo.number) {
+    for (let i = lineFrom.number + 1; i <= lineTo.number; i++) {
+      lines.push(state.doc.line(i))
+    }
+  }
+  return lines
+}
 
 const blockStyles = {
   bold: '**',
@@ -63,13 +76,13 @@ const toggleBlock =
       ]
 
       const fromShift = isBlockBefore ? -style.length : style.length
-      const afterShift = isBlockAfter ? -style.length : style.length
+      const toShift = isBlockAfter ? -style.length : style.length
 
       return {
         changes,
         range: EditorSelection.range(
           range.from + fromShift,
-          range.to + afterShift
+          range.to + toShift
         ),
       }
     })
@@ -79,54 +92,92 @@ const toggleBlock =
     return true
   }
 
+const blockquotePattern = /^>\s/
+
+const toggleBlockquote: StateCommand = ({ state, dispatch }) => {
+  const changeTransaction: TransactionSpec = state.changeByRange((range) => {
+    const lines = getAffectedLines(state, range)
+    let shiftFrom = 0
+    let shiftTo = 0
+
+    const isTogglingOn = !lines.every((line) =>
+      blockquotePattern.test(line.text)
+    )
+
+    const changes = lines.reduce<ChangeSpec[]>((acc, line, i) => {
+      let change: ChangeSpec | undefined
+      if (isTogglingOn) {
+        if (!blockquotePattern.test(line.text)) {
+          shiftTo += 2
+          change = {
+            from: line.from,
+            insert: '> ',
+          }
+        }
+      } else {
+        if (blockquotePattern.test(line.text)) {
+          shiftTo -= 2
+          change = {
+            from: line.from,
+            to: line.from + 2,
+            insert: '',
+          }
+        }
+      }
+      if (i === 0) {
+        shiftFrom = shiftTo
+      }
+      return change ? acc.concat(change) : acc
+    }, [])
+
+    return {
+      changes,
+      range: EditorSelection.range(range.from + shiftFrom, range.to + shiftTo),
+    }
+  })
+
+  dispatch(state.update(changeTransaction))
+
+  return true
+}
+
 const toggleHeading: StateCommand = ({ state, dispatch }) => {
   const changeTransaction: TransactionSpec = state.changeByRange((range) => {
-    const lineFrom = state.doc.lineAt(range.from)
-    const lineTo = state.doc.lineAt(range.to)
-    const lines = [lineFrom]
-    if (lineFrom.number !== lineTo.number) {
-      for (let i = lineFrom.number + 1; i <= lineTo.number; i++) {
-        lines.push(state.doc.line(i))
-      }
-    }
-
-    let fromShift = 0
-    let afterShift = 0
+    const lines = getAffectedLines(state, range)
+    let shiftFrom = 0
+    let shiftTo = 0
 
     const changes = lines.reduce<ChangeSpec[]>((acc, line, i) => {
       let change: ChangeSpec
       if (/^#{6}\s/.test(line.text)) {
-        afterShift -= 7
+        shiftTo -= 7
         change = {
           from: line.from,
           to: line.from + 7,
           insert: '',
         }
       } else if (/^#{1,5}\s/.test(line.text)) {
-        afterShift += 1
+        shiftTo += 1
         change = {
           from: line.from,
           insert: '#',
         }
       } else {
-        afterShift += 2
+        shiftTo += 2
         change = {
           from: line.from,
           insert: '# ',
         }
       }
       if (i === 0) {
-        fromShift = afterShift
+        shiftFrom = shiftTo
       }
       return acc.concat(change)
     }, [])
 
     return {
       changes,
-      range: EditorSelection.range(
-        range.from + fromShift,
-        range.to + afterShift
-      ),
+      range: EditorSelection.range(range.from + shiftFrom, range.to + shiftTo),
     }
   })
 
@@ -136,7 +187,7 @@ const toggleHeading: StateCommand = ({ state, dispatch }) => {
 }
 
 export const editorCommands: Record<EditorCommand, StateCommand> = {
-  blockquote: (_) => true,
+  blockquote: toggleBlockquote,
   bold: toggleBlock('bold'),
   clean: (_) => true,
   heading: toggleHeading,
