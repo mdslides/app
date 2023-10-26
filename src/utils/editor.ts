@@ -87,8 +87,7 @@ const toggleBlock =
       }
     })
 
-    dispatch(state.update(changeTransaction))
-
+    dispatch(state.update(changeTransaction, { scrollIntoView: true }))
     return true
   }
 
@@ -136,8 +135,7 @@ const toggleBlockquote: StateCommand = ({ state, dispatch }) => {
     }
   })
 
-  dispatch(state.update(changeTransaction))
-
+  dispatch(state.update(changeTransaction, { scrollIntoView: true }))
   return true
 }
 
@@ -181,22 +179,87 @@ const toggleHeading: StateCommand = ({ state, dispatch }) => {
     }
   })
 
-  dispatch(state.update(changeTransaction))
-
+  dispatch(state.update(changeTransaction, { scrollIntoView: true }))
   return true
 }
+
+const templates = {
+  hr: '---',
+  image: '![]()',
+  table: [
+    '| Column 1 | Column 2 | Column 3 |',
+    '| --- | --- | --- |',
+    '| Text | Text | Text |',
+  ].join('\n'),
+}
+
+const insertTemplate =
+  (type: keyof typeof templates): StateCommand =>
+  ({ state, dispatch }) => {
+    const changeTransaction: TransactionSpec = state.changeByRange((range) => {
+      const lineFrom = state.doc.lineAt(range.from)
+      const lineTo = state.doc.lineAt(range.to)
+
+      const textBounds: [string, string] = [
+        range.from === lineFrom.from
+          ? lineFrom.number === 1 || !state.doc.line(lineFrom.number - 1).text
+            ? ''
+            : '\n'
+          : '\n\n',
+        type === 'hr' || range.to !== lineTo.to
+          ? '\n\n'
+          : lineTo.number === state.doc.lines ||
+            !state.doc.line(lineTo.number + 1).text
+          ? ''
+          : '\n',
+      ]
+      const text = textBounds.join(templates[type])
+
+      let selectionAnchor = range.from
+      let selectionHead = range.to
+
+      switch (type) {
+        case 'hr':
+          selectionAnchor += text.length
+          selectionHead = selectionAnchor
+          break
+        case 'image':
+          selectionAnchor += text.length - textBounds[1].length - 1
+          selectionHead = selectionAnchor
+          break
+        case 'table':
+          selectionAnchor += textBounds[0].length + 2
+          selectionHead = selectionAnchor + 8
+          break
+      }
+
+      return {
+        changes: [
+          {
+            from: range.from,
+            to: range.to,
+            insert: text,
+          },
+        ],
+        range: EditorSelection.range(selectionAnchor, selectionHead),
+      }
+    })
+
+    dispatch(state.update(changeTransaction, { scrollIntoView: true }))
+    return true
+  }
 
 export const editorCommands: Record<EditorCommand, StateCommand> = {
   blockquote: toggleBlockquote,
   bold: toggleBlock('bold'),
   clean: (_) => true,
   heading: toggleHeading,
-  hr: (_) => true,
-  image: (_) => true,
+  hr: insertTemplate('hr'),
+  image: insertTemplate('image'),
   italic: toggleBlock('italic'),
   ol: (_) => true,
   redo,
-  table: (_) => true,
+  table: insertTemplate('table'),
   ul: (_) => true,
   undo,
 }
