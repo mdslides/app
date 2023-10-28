@@ -302,7 +302,7 @@ const toggleList =
           }
         }
         if (i === 0) {
-          shiftFrom = shiftTo
+          shiftFrom = Math.max(shiftTo, lines[0].from - range.from)
         }
         return change ? acc.concat(change) : acc
       }, [])
