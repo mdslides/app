@@ -36,6 +36,72 @@ const getAffectedLines = (state: EditorState, range: SelectionRange) => {
   return lines
 }
 
+const templates = {
+  hr: '---',
+  image: '![]()',
+  table: [
+    '| Column 1 | Column 2 | Column 3 |',
+    '| --- | --- | --- |',
+    '| Text | Text | Text |',
+  ].join('\n'),
+}
+
+const insertTemplate =
+  (type: keyof typeof templates): StateCommand =>
+  ({ state, dispatch }) => {
+    const changeTransaction: TransactionSpec = state.changeByRange((range) => {
+      const lineFrom = state.doc.lineAt(range.from)
+      const lineTo = state.doc.lineAt(range.to)
+
+      const textBounds: [string, string] = [
+        range.from === lineFrom.from
+          ? lineFrom.number === 1 || !state.doc.line(lineFrom.number - 1).text
+            ? ''
+            : '\n'
+          : '\n\n',
+        type === 'hr' || range.to !== lineTo.to
+          ? '\n\n'
+          : lineTo.number === state.doc.lines ||
+            !state.doc.line(lineTo.number + 1).text
+          ? ''
+          : '\n',
+      ]
+      const text = textBounds.join(templates[type])
+
+      let selectionAnchor = range.from
+      let selectionHead = range.to
+
+      switch (type) {
+        case 'hr':
+          selectionAnchor += text.length
+          selectionHead = selectionAnchor
+          break
+        case 'image':
+          selectionAnchor += text.length - textBounds[1].length - 1
+          selectionHead = selectionAnchor
+          break
+        case 'table':
+          selectionAnchor += textBounds[0].length + 2
+          selectionHead = selectionAnchor + 8
+          break
+      }
+
+      return {
+        changes: [
+          {
+            from: range.from,
+            to: range.to,
+            insert: text,
+          },
+        ],
+        range: EditorSelection.range(selectionAnchor, selectionHead),
+      }
+    })
+
+    dispatch(state.update(changeTransaction, { scrollIntoView: true }))
+    return true
+  }
+
 const blockStyles = {
   bold: '**',
   italic: '*',
@@ -183,65 +249,70 @@ const toggleHeading: StateCommand = ({ state, dispatch }) => {
   return true
 }
 
-const templates = {
-  hr: '---',
-  image: '![]()',
-  table: [
-    '| Column 1 | Column 2 | Column 3 |',
-    '| --- | --- | --- |',
-    '| Text | Text | Text |',
-  ].join('\n'),
+const listPatterns = {
+  ol: /^\d+\.\s/,
+  ul: /^-\s/,
 }
 
-const insertTemplate =
-  (type: keyof typeof templates): StateCommand =>
+const toggleList =
+  (type: keyof typeof listPatterns): StateCommand =>
   ({ state, dispatch }) => {
     const changeTransaction: TransactionSpec = state.changeByRange((range) => {
-      const lineFrom = state.doc.lineAt(range.from)
-      const lineTo = state.doc.lineAt(range.to)
+      const pattern = listPatterns[type]
+      const patternOpposite = listPatterns[type === 'ol' ? 'ul' : 'ol']
+      const lines = getAffectedLines(state, range)
+      let shiftFrom = 0
+      let shiftTo = 0
 
-      const textBounds: [string, string] = [
-        range.from === lineFrom.from
-          ? lineFrom.number === 1 || !state.doc.line(lineFrom.number - 1).text
-            ? ''
-            : '\n'
-          : '\n\n',
-        type === 'hr' || range.to !== lineTo.to
-          ? '\n\n'
-          : lineTo.number === state.doc.lines ||
-            !state.doc.line(lineTo.number + 1).text
-          ? ''
-          : '\n',
-      ]
-      const text = textBounds.join(templates[type])
+      const isTogglingOn = !lines.every((line) => pattern.test(line.text))
 
-      let selectionAnchor = range.from
-      let selectionHead = range.to
+      const changes = lines.reduce<ChangeSpec[]>((acc, line, i) => {
+        const insert = type === 'ol' ? `${i + 1}. ` : '- '
+        let change: ChangeSpec | undefined
 
-      switch (type) {
-        case 'hr':
-          selectionAnchor += text.length
-          selectionHead = selectionAnchor
-          break
-        case 'image':
-          selectionAnchor += text.length - textBounds[1].length - 1
-          selectionHead = selectionAnchor
-          break
-        case 'table':
-          selectionAnchor += textBounds[0].length + 2
-          selectionHead = selectionAnchor + 8
-          break
-      }
+        if (isTogglingOn) {
+          if (pattern.test(line.text)) {
+            return acc
+          } else if (patternOpposite.test(line.text)) {
+            const remove = line.text.match(patternOpposite)?.[0] ?? ''
+            shiftTo += insert.length - remove.length
+            change = {
+              from: line.from,
+              to: line.from + remove.length,
+              insert,
+            }
+          } else {
+            shiftTo += insert.length
+            change = {
+              from: line.from,
+              insert,
+            }
+          }
+        } else {
+          const remove =
+            line.text.match(pattern)?.[0] ??
+            line.text.match(patternOpposite)?.[0]
+          if (remove?.length) {
+            shiftTo -= remove.length
+            change = {
+              from: line.from,
+              to: line.from + remove.length,
+              insert: '',
+            }
+          }
+        }
+        if (i === 0) {
+          shiftFrom = shiftTo
+        }
+        return change ? acc.concat(change) : acc
+      }, [])
 
       return {
-        changes: [
-          {
-            from: range.from,
-            to: range.to,
-            insert: text,
-          },
-        ],
-        range: EditorSelection.range(selectionAnchor, selectionHead),
+        changes,
+        range: EditorSelection.range(
+          range.from + shiftFrom,
+          range.to + shiftTo
+        ),
       }
     })
 
@@ -257,10 +328,10 @@ export const editorCommands: Record<EditorCommand, StateCommand> = {
   hr: insertTemplate('hr'),
   image: insertTemplate('image'),
   italic: toggleBlock('italic'),
-  ol: (_) => true,
+  ol: toggleList('ol'),
   redo,
   table: insertTemplate('table'),
-  ul: (_) => true,
+  ul: toggleList('ul'),
   undo,
 }
 
