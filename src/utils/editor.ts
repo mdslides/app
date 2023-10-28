@@ -349,8 +349,14 @@ export const getActiveCommands = (state: EditorState) => {
       case 'ATXHeading6':
         activeCommands.heading = true
         break
+      case 'BulletList':
+        activeCommands.ul = true
+        break
       case 'Emphasis':
         activeCommands.italic = true
+        break
+      case 'OrderedList':
+        activeCommands.ol = true
         break
       case 'StrongEmphasis':
         activeCommands.bold = true
