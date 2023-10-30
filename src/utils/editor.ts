@@ -24,6 +24,68 @@ export type EditorCommand =
   | 'ul'
   | 'undo'
 
+const cleanFormat: StateCommand = ({ state, dispatch }) => {
+  const tree = syntaxTree(state)
+  const changeTransaction: TransactionSpec = state.changeByRange((range) => {
+    const nodes: Record<number, SyntaxNode> = {}
+    for (let i = range.from; i <= range.to; i++) {
+      const node = tree.resolve(i) as { index: number } & SyntaxNode
+      if (
+        (node.name === 'Emphasis' || node.name === 'StrongEmphasis') &&
+        node.from >= range.from &&
+        node.to <= range.to
+      ) {
+        nodes[node.index] = node
+      }
+    }
+
+    const selectionAnchor = range.from
+    let selectionHead = range.to
+
+    const changes = Object.values(nodes).reduce<ChangeSpec[]>((acc, node) => {
+      switch (node.name) {
+        case 'Emphasis':
+          selectionHead -= 2
+          return acc.concat(
+            {
+              from: node.from,
+              to: node.from + 1,
+              insert: '',
+            },
+            {
+              from: node.to - 1,
+              to: node.to,
+              insert: '',
+            }
+          )
+        case 'StrongEmphasis':
+          selectionHead -= 4
+          return acc.concat(
+            {
+              from: node.from,
+              to: node.from + 2,
+              insert: '',
+            },
+            {
+              from: node.to - 2,
+              to: node.to,
+              insert: '',
+            }
+          )
+      }
+      return acc
+    }, [])
+
+    return {
+      changes,
+      range: EditorSelection.range(selectionAnchor, selectionHead),
+    }
+  })
+
+  dispatch(state.update(changeTransaction, { scrollIntoView: true }))
+  return true
+}
+
 const getAffectedLines = (state: EditorState, range: SelectionRange) => {
   const lineFrom = state.doc.lineAt(range.from)
   const lineTo = state.doc.lineAt(range.to)
@@ -323,7 +385,7 @@ const toggleList =
 export const editorCommands: Record<EditorCommand, StateCommand> = {
   blockquote: toggleBlockquote,
   bold: toggleBlock('bold'),
-  clean: (_) => true,
+  clean: cleanFormat,
   heading: toggleHeading,
   hr: insertTemplate('hr'),
   image: insertTemplate('image'),
