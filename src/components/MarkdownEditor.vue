@@ -36,6 +36,7 @@ import {
   redoDepth,
   undoDepth,
 } from '@codemirror/commands'
+import { syntaxHighlighting } from '@codemirror/language'
 import { markdown, markdownKeymap } from '@codemirror/lang-markdown'
 
 import formatBoldIcon from '@material-design-icons/svg/sharp/format_bold.svg?raw'
@@ -53,6 +54,7 @@ import undoIcon from '@material-design-icons/svg/sharp/undo.svg?raw'
 
 import {
   editorCommands,
+  editorSyntaxHighlightStyle,
   getActiveCommands,
   isMac,
   type EditorCommand,
@@ -146,6 +148,7 @@ export default defineComponent({
       history(),
       markdown(),
       placeholder(props.placeholder),
+      syntaxHighlighting(editorSyntaxHighlightStyle),
       keymap.of([
         ...customKeymap,
         ...markdownKeymap,

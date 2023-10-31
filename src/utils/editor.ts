@@ -7,7 +7,8 @@ import {
   type TransactionSpec,
 } from '@codemirror/state'
 import { redo, undo } from '@codemirror/commands'
-import { syntaxTree } from '@codemirror/language'
+import { HighlightStyle, syntaxTree } from '@codemirror/language'
+import { tags } from '@lezer/highlight'
 import type { SyntaxNode } from '@lezer/common'
 
 export type EditorCommand =
@@ -396,6 +397,12 @@ export const editorCommands: Record<EditorCommand, StateCommand> = {
   ul: toggleList('ul'),
   undo,
 }
+
+export const editorSyntaxHighlightStyle = HighlightStyle.define([
+  { tag: tags.emphasis, fontStyle: 'italic' },
+  { tag: tags.heading, fontWeight: 'bold' },
+  { tag: tags.strong, fontWeight: 'bold' },
+])
 
 export const getActiveCommands = (state: EditorState) => {
   const activeCommands: Partial<Record<EditorCommand, boolean>> = {}
