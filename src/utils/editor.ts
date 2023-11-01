@@ -25,6 +25,28 @@ export type EditorCommand =
   | 'ul'
   | 'undo'
 
+const blockStyles = {
+  bold: '**',
+  italic: '*',
+}
+
+const blockquotePattern = /^>\s/
+
+const listPatterns = {
+  ol: /^\d+\.\s/,
+  ul: /^-\s/,
+}
+
+const templates = {
+  hr: '---',
+  image: '![]()',
+  table: [
+    '| Column 1 | Column 2 | Column 3 |',
+    '| --- | --- | --- |',
+    '| Text | Text | Text |',
+  ].join('\n'),
+}
+
 const cleanFormat: StateCommand = ({ state, dispatch }) => {
   const tree = syntaxTree(state)
   const changeTransaction: TransactionSpec = state.changeByRange((range) => {
@@ -99,16 +121,6 @@ const getAffectedLines = (state: EditorState, range: SelectionRange) => {
   return lines
 }
 
-const templates = {
-  hr: '---',
-  image: '![]()',
-  table: [
-    '| Column 1 | Column 2 | Column 3 |',
-    '| --- | --- | --- |',
-    '| Text | Text | Text |',
-  ].join('\n'),
-}
-
 const insertTemplate =
   (type: keyof typeof templates): StateCommand =>
   ({ state, dispatch }) => {
@@ -165,11 +177,6 @@ const insertTemplate =
     return true
   }
 
-const blockStyles = {
-  bold: '**',
-  italic: '*',
-}
-
 const toggleBlock =
   (type: keyof typeof blockStyles): StateCommand =>
   ({ state, dispatch }) => {
@@ -204,14 +211,11 @@ const toggleBlock =
             },
       ]
 
-      const fromShift = isBlockBefore ? -style.length : style.length
-      const toShift = isBlockAfter ? -style.length : style.length
-
       return {
         changes,
         range: EditorSelection.range(
-          range.from + fromShift,
-          range.to + toShift
+          range.from + (isBlockBefore ? -style.length : style.length),
+          range.to + (isBlockAfter ? -style.length : style.length)
         ),
       }
     })
@@ -219,8 +223,6 @@ const toggleBlock =
     dispatch(state.update(changeTransaction, { scrollIntoView: true }))
     return true
   }
-
-const blockquotePattern = /^>\s/
 
 const toggleBlockquote: StateCommand = ({ state, dispatch }) => {
   const changeTransaction: TransactionSpec = state.changeByRange((range) => {
@@ -310,11 +312,6 @@ const toggleHeading: StateCommand = ({ state, dispatch }) => {
 
   dispatch(state.update(changeTransaction, { scrollIntoView: true }))
   return true
-}
-
-const listPatterns = {
-  ol: /^\d+\.\s/,
-  ul: /^-\s/,
 }
 
 const toggleList =
