@@ -1,6 +1,6 @@
 <template>
-  <div class="home-view">
-    <header class="home-view__header">
+  <div class="root-view">
+    <header class="root-view__header">
       <a :href="appLogoLink" target="_blank">
         <AppLogo />
       </a>
@@ -12,7 +12,7 @@
       />
     </header>
 
-    <div class="home-view__split">
+    <div class="root-view__split">
       <MarkdownEditor
         :placeholder="t('MarkdownEditor.placeholder')"
         :value="contentOpened"
@@ -139,7 +139,7 @@ export default defineComponent({
 @import '@/styles/variables';
 @import '@/styles/mixins';
 
-.home-view {
+.root-view {
   display: flex;
   flex-direction: column;
   margin: 0 auto;

@@ -1,5 +1,5 @@
 <template>
-  <HomeView />
+  <RootView />
 </template>
 
 <script lang="ts">
@@ -10,11 +10,11 @@ import {
   useLanguagePreserve,
 } from '@/functions/language'
 
-import HomeView from './views/HomeView.vue'
+import RootView from './views/RootView.vue'
 
 export default defineComponent({
   components: {
-    HomeView,
+    RootView,
   },
   setup() {
     useLanguagePreserve()
