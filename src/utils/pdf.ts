@@ -30,7 +30,7 @@ export const createPdf = async (pages: HTMLCollection) => {
   addFonts(doc)
   doc.deletePage(1)
 
-  for (const child of pages) {
+  for (const child of Array.from(pages)) {
     doc.addPage()
     const page = elementToSVG(child)
     await doc.svg(page.documentElement, {

@@ -22,7 +22,8 @@ export const useLanguageInitialize = () => {
   if (requestedLocale && availableLocales.includes(requestedLocale)) {
     locale.value = requestedLocale
   } else if (isLocalStorageAvailable()) {
-    locale.value = localStorage.getItem(languageKey) ?? fallbackLocale.value
+    locale.value =
+      localStorage.getItem(languageKey) ?? (fallbackLocale.value as string)
   }
 }
 
