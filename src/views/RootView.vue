@@ -24,8 +24,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, onMounted, ref, watch } from 'vue'
+<script setup lang="ts">
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { debounce } from 'lodash'
 import { fileOpen, fileSave } from 'browser-fs-access'
@@ -39,99 +39,78 @@ import SlidesPreview from '../components/SlidesPreview.vue'
 
 const autosaveKey = 'mdslides_draft'
 
-export default defineComponent({
-  components: {
-    AppLogo,
-    MarkdownEditor,
-    NavigationBar,
-    SlidesPreview,
-  },
-  setup() {
-    const { fallbackLocale, locale, t } = useI18n()
-    const content = ref('')
-    const contentOpened = ref('')
+const { fallbackLocale, locale, t } = useI18n()
+const content = ref('')
+const contentOpened = ref('')
 
-    const handleDownload = async () => {
-      try {
-        const blob = new Blob([content.value], {
-          type: 'text/plain',
-        })
-
-        await fileSave(blob, {
-          extensions: ['.md'],
-          fileName: getTitle(content.value),
-        })
-      } catch {
-        // ignore
-      }
-    }
-
-    const handleEditorInput = debounce((value: string) => {
-      content.value = value
-    }, 100)
-
-    const handleExport = async () => {
-      try {
-        const slidesContainer = document.getElementById(previewContainerId)
-        if (slidesContainer?.children.length) {
-          const blob = await createPdf(slidesContainer.children)
-          await fileSave(blob, {
-            fileName: getTitle(content.value),
-          })
-        }
-      } catch {
-        // ignore
-      }
-    }
-
-    const handleUpload = async () => {
-      try {
-        const blob = await fileOpen({
-          mimeTypes: ['text/*'],
-          extensions: ['.md'],
-        })
-
-        setContent(await new Response(blob).text())
-      } catch {
-        // ignore
-      }
-    }
-
-    const setContent = (value: string) => {
-      content.value = value
-      contentOpened.value = value
-    }
-
-    const appLogoLink = computed(() => {
-      return locale.value === fallbackLocale.value ? '/' : `/${locale.value}/`
+const handleDownload = async () => {
+  try {
+    const blob = new Blob([content.value], {
+      type: 'text/plain',
     })
 
-    if (isLocalStorageAvailable()) {
-      watch(
-        content,
-        debounce(() => {
-          localStorage.setItem(autosaveKey, content.value)
-        }, 1600)
-      )
-    }
+    await fileSave(blob, {
+      extensions: ['.md'],
+      fileName: getTitle(content.value),
+    })
+  } catch {
+    // ignore
+  }
+}
 
-    onMounted(() => {
-      if (isLocalStorageAvailable()) {
-        setContent(localStorage.getItem(autosaveKey) ?? '')
-      }
+const handleEditorInput = debounce((value: string) => {
+  content.value = value
+}, 100)
+
+const handleExport = async () => {
+  try {
+    const slidesContainer = document.getElementById(previewContainerId)
+    if (slidesContainer?.children.length) {
+      const blob = await createPdf(slidesContainer.children)
+      await fileSave(blob, {
+        fileName: getTitle(content.value),
+      })
+    }
+  } catch {
+    // ignore
+  }
+}
+
+const handleUpload = async () => {
+  try {
+    const blob = await fileOpen({
+      mimeTypes: ['text/*'],
+      extensions: ['.md'],
     })
 
-    return {
-      appLogoLink,
-      content,
-      contentOpened,
-      handleDownload,
-      handleEditorInput,
-      handleExport,
-      handleUpload,
-      t,
-    }
-  },
+    setContent(await new Response(blob).text())
+  } catch {
+    // ignore
+  }
+}
+
+const setContent = (value: string) => {
+  content.value = value
+  contentOpened.value = value
+}
+
+const appLogoLink = computed(() => {
+  return locale.value === fallbackLocale.value ? '/' : `/${locale.value}/`
+})
+
+if (isLocalStorageAvailable()) {
+  watch(
+    content,
+    debounce(() => {
+      localStorage.setItem(autosaveKey, content.value)
+    }, 1600)
+  )
+}
+
+onMounted(() => {
+  if (isLocalStorageAvailable()) {
+    setContent(localStorage.getItem(autosaveKey) ?? '')
+  }
 })
 </script>
 

@@ -5,12 +5,12 @@
         <button
           v-for="button in buttonGroup"
           :key="button.name"
-          v-html="button.icon"
           :class="{ active: activeButtons[button.name] }"
           :disabled="disabledButtons[button.name]"
           :title="button.tooltip"
           tabindex="-1"
           @click="button.action"
+          v-html="button.icon"
         />
 
         <span class="separator">|</span>
@@ -19,8 +19,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, onMounted, ref, watch } from 'vue'
+<script setup lang="ts">
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   EditorView,
@@ -111,93 +111,84 @@ const customKeymap: KeyBinding[] = Object.entries(commandKeys).map(
   })
 )
 
-export default defineComponent({
-  props: {
-    placeholder: {
-      type: String,
-      default: '',
-    },
-    value: {
-      type: String,
-      default: '',
-    },
-  },
-  emits: ['input'],
-  setup(props, { emit }) {
-    const { t } = useI18n()
-    const container = ref<HTMLDivElement>()
-    const activeButtons = ref<Partial<Record<EditorCommand, boolean>>>({})
-    const disabledButtons = ref<Partial<Record<EditorCommand, boolean>>>({
-      redo: true,
-      undo: true,
-    })
-    let codeMirror: EditorView
+const props = withDefaults(
+  defineProps<{
+    placeholder: string
+    value: string
+  }>(),
+  {
+    placeholder: '',
+    value: '',
+  }
+)
 
-    const extensions = [
-      EditorView.lineWrapping,
-      EditorView.updateListener.of((update) => {
-        if (update.docChanged) {
-          disabledButtons.value.redo = !redoDepth(codeMirror.state)
-          disabledButtons.value.undo = !undoDepth(codeMirror.state)
-          emit('input', update.state.doc.toString())
-        }
-        if (update.selectionSet) {
-          activeButtons.value = getActiveCommands(codeMirror.state)
-        }
-      }),
-      history(),
-      markdown(),
-      placeholder(props.placeholder),
-      syntaxHighlighting(editorSyntaxHighlightStyle),
-      keymap.of([
-        ...customKeymap,
-        ...markdownKeymap,
-        ...historyKeymap,
-        ...defaultKeymap,
-      ]),
-    ]
+const emit = defineEmits<{
+  (e: 'input', value: string): void
+}>()
 
-    onMounted(() => {
-      codeMirror = new EditorView({
-        extensions,
-        parent: container.value,
-      })
-    })
+const { t } = useI18n()
+const container = ref<HTMLDivElement>()
+const activeButtons = ref<Partial<Record<EditorCommand, boolean>>>({})
+const disabledButtons = ref<Partial<Record<EditorCommand, boolean>>>({
+  redo: true,
+  undo: true,
+})
+let codeMirror: EditorView
 
-    watch(
-      () => props.value,
-      () => {
-        codeMirror.setState(
-          EditorState.create({ doc: props.value, extensions })
-        )
-      }
-    )
-
-    const toolbarButtons = computed(() => {
-      return commandGroups.map((group) =>
-        group.map((command) => ({
-          action: () => {
-            editorCommands[command](codeMirror)
-            codeMirror.focus()
-          },
-          icon: commandIcons[command],
-          name: command,
-          tooltip:
-            t(`MarkdownEditor.Commands.${command}`) +
-            (commandKeysLocalized[command]
-              ? ` (${commandKeysLocalized[command]})`
-              : ''),
-        }))
-      )
-    })
-
-    return {
-      activeButtons,
-      container,
-      disabledButtons,
-      toolbarButtons,
+const extensions = [
+  EditorView.lineWrapping,
+  EditorView.updateListener.of((update) => {
+    if (update.docChanged) {
+      disabledButtons.value.redo = !redoDepth(codeMirror.state)
+      disabledButtons.value.undo = !undoDepth(codeMirror.state)
+      emit('input', update.state.doc.toString())
     }
-  },
+    if (update.selectionSet) {
+      activeButtons.value = getActiveCommands(codeMirror.state)
+    }
+  }),
+  history(),
+  markdown(),
+  placeholder(props.placeholder),
+  syntaxHighlighting(editorSyntaxHighlightStyle),
+  keymap.of([
+    ...customKeymap,
+    ...markdownKeymap,
+    ...historyKeymap,
+    ...defaultKeymap,
+  ]),
+]
+
+onMounted(() => {
+  codeMirror = new EditorView({
+    extensions,
+    parent: container.value,
+  })
+})
+
+watch(
+  () => props.value,
+  () => {
+    codeMirror.setState(EditorState.create({ doc: props.value, extensions }))
+  }
+)
+
+const toolbarButtons = computed(() => {
+  return commandGroups.map((group) =>
+    group.map((command) => ({
+      action: () => {
+        editorCommands[command](codeMirror)
+        codeMirror.focus()
+      },
+      icon: commandIcons[command],
+      name: command,
+      tooltip:
+        t(`MarkdownEditor.Commands.${command}`) +
+        (commandKeysLocalized[command]
+          ? ` (${commandKeysLocalized[command]})`
+          : ''),
+    }))
+  )
 })
 </script>
 

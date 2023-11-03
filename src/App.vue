@@ -2,9 +2,7 @@
   <RootView />
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-
+<script setup lang="ts">
 import {
   useLanguageInitialize,
   useLanguagePreserve,
@@ -12,15 +10,8 @@ import {
 
 import RootView from './views/RootView.vue'
 
-export default defineComponent({
-  components: {
-    RootView,
-  },
-  setup() {
-    useLanguagePreserve()
-    useLanguageInitialize()
-  },
-})
+useLanguagePreserve()
+useLanguageInitialize()
 </script>
 
 <style lang="scss">

@@ -1,13 +1,13 @@
 <template>
   <div :id="containerId" class="slides-preview">
     <template v-for="(slide, i) in slidesMarkup" :key="i">
-      <div v-html="slide" class="slides-preview__slide slide-typography" />
+      <div class="slides-preview__slide slide-typography" v-html="slide" />
     </template>
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, ref } from 'vue'
+<script setup lang="ts">
+import { computed, ref } from 'vue'
 import { marked } from 'marked'
 import sanitizeHtml from 'sanitize-html'
 
@@ -23,33 +23,23 @@ const sanitizeHtmlOptions = {
   allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
 }
 
-export default defineComponent({
-  props: {
-    value: {
-      type: String,
-      required: true,
-    },
-  },
-  setup(props) {
-    const containerId = ref(previewContainerId)
+const props = defineProps<{
+  value: string
+}>()
 
-    const slidesMarkup = computed(() => {
-      return sanitizeHtml(
-        marked.parse(props.value, markedOptions),
-        sanitizeHtmlOptions
-      ).split(/\n(?=<h[12])/)
-    })
+const containerId = ref(previewContainerId)
 
-    return {
-      containerId,
-      slidesMarkup,
-    }
-  },
+const slidesMarkup = computed(() => {
+  return sanitizeHtml(
+    marked.parse(props.value, markedOptions),
+    sanitizeHtmlOptions
+  ).split(/\n(?=<h[12])/)
 })
 </script>
 
 <style lang="scss" scoped>
 @use 'sass:math';
+
 @import '@/styles/variables';
 @import '@/styles/mixins';
 

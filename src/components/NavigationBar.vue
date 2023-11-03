@@ -9,15 +9,15 @@
         {{ t('NavigationBar.file') }}
 
         <ul>
-          <li role="button" @click="$emit('upload')">
+          <li role="button" @click="emit('upload')">
             <span>{{ t('NavigationBar.open') }}</span>
           </li>
 
-          <li role="button" @click="$emit('download')">
+          <li role="button" @click="emit('download')">
             <span>{{ t('NavigationBar.downloadAsMD') }}</span>
           </li>
 
-          <li role="button" @click="$emit('export')">
+          <li role="button" @click="emit('export')">
             <span>{{ t('NavigationBar.exportAsPDF') }}</span>
           </li>
         </ul>
@@ -33,10 +33,10 @@
         {{ locale }}
 
         <ul>
-          <template v-for="item in availableLocales">
+          <template v-for="(item, i) in availableLocales">
             <li
               v-if="item !== locale"
-              :key="item"
+              :key="i"
               role="button"
               @click="locale = item"
             >
@@ -49,42 +49,35 @@
   </nav>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue'
+<script setup lang="ts">
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-export default defineComponent({
-  emits: ['download', 'export', 'upload'],
-  setup() {
-    const { availableLocales, locale } = useI18n({ useScope: 'global' })
-    const { t } = useI18n()
-    const activeGroup = ref<string | null>(null)
+const { availableLocales, locale } = useI18n({ useScope: 'global' })
+const { t } = useI18n()
+const activeGroup = ref<string | null>(null)
 
-    const handleGroupClick = (group: string) => {
-      if (activeGroup.value === group) {
-        return
-      }
+const emit = defineEmits<{
+  (e: 'download'): void
+  (e: 'export'): void
+  (e: 'upload'): void
+}>()
 
-      const listener = () => {
-        document.body.removeEventListener('click', listener)
-        activeGroup.value = null
-      }
+const handleGroupClick = (group: string) => {
+  if (activeGroup.value === group) {
+    return
+  }
 
-      setTimeout(() => {
-        document.body.addEventListener('click', listener)
-        activeGroup.value = group
-      })
-    }
+  const listener = () => {
+    document.body.removeEventListener('click', listener)
+    activeGroup.value = null
+  }
 
-    return {
-      activeGroup,
-      availableLocales,
-      locale,
-      handleGroupClick,
-      t,
-    }
-  },
-})
+  setTimeout(() => {
+    document.body.addEventListener('click', listener)
+    activeGroup.value = group
+  })
+}
 </script>
 
 <style lang="scss" scoped>
