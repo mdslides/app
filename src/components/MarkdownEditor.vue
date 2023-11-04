@@ -1,24 +1,3 @@
-<template>
-  <div ref="container" class="markdown-editor">
-    <div class="markdown-editor__toolbar">
-      <template v-for="(buttonGroup, i) in toolbarButtons" :key="i">
-        <button
-          v-for="button in buttonGroup"
-          :key="button.name"
-          :class="{ active: activeButtons[button.name] }"
-          :disabled="disabledButtons[button.name]"
-          :title="button.tooltip"
-          tabindex="-1"
-          @click="button.action"
-          v-html="button.icon"
-        />
-
-        <span class="separator">|</span>
-      </template>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -191,6 +170,27 @@ const toolbarButtons = computed(() => {
   )
 })
 </script>
+
+<template>
+  <div ref="container" class="markdown-editor">
+    <div class="markdown-editor__toolbar">
+      <template v-for="(buttonGroup, i) in toolbarButtons" :key="i">
+        <button
+          v-for="button in buttonGroup"
+          :key="button.name"
+          :class="{ active: activeButtons[button.name] }"
+          :disabled="disabledButtons[button.name]"
+          :title="button.tooltip"
+          tabindex="-1"
+          @click="button.action"
+          v-html="button.icon"
+        />
+
+        <span class="separator">|</span>
+      </template>
+    </div>
+  </div>
+</template>
 
 <style lang="scss">
 .markdown-editor {

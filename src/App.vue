@@ -1,7 +1,3 @@
-<template>
-  <RootView />
-</template>
-
 <script setup lang="ts">
 import {
   useLanguageInitialize,
@@ -13,6 +9,10 @@ import RootView from './views/RootView.vue'
 useLanguagePreserve()
 useLanguageInitialize()
 </script>
+
+<template>
+  <RootView />
+</template>
 
 <style lang="scss">
 @import '@fontsource/mulish/400.css';

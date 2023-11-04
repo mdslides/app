@@ -1,3 +1,34 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { availableLocales, locale } = useI18n({ useScope: 'global' })
+const { t } = useI18n()
+const activeGroup = ref<string | null>(null)
+
+const emit = defineEmits<{
+  (e: 'download'): void
+  (e: 'export'): void
+  (e: 'upload'): void
+}>()
+
+const handleGroupClick = (group: string) => {
+  if (activeGroup.value === group) {
+    return
+  }
+
+  const listener = () => {
+    document.body.removeEventListener('click', listener)
+    activeGroup.value = null
+  }
+
+  setTimeout(() => {
+    document.body.addEventListener('click', listener)
+    activeGroup.value = group
+  })
+}
+</script>
+
 <template>
   <nav class="navigation-bar">
     <ul>
@@ -48,37 +79,6 @@
     </ul>
   </nav>
 </template>
-
-<script setup lang="ts">
-import { ref } from 'vue'
-import { useI18n } from 'vue-i18n'
-
-const { availableLocales, locale } = useI18n({ useScope: 'global' })
-const { t } = useI18n()
-const activeGroup = ref<string | null>(null)
-
-const emit = defineEmits<{
-  (e: 'download'): void
-  (e: 'export'): void
-  (e: 'upload'): void
-}>()
-
-const handleGroupClick = (group: string) => {
-  if (activeGroup.value === group) {
-    return
-  }
-
-  const listener = () => {
-    document.body.removeEventListener('click', listener)
-    activeGroup.value = null
-  }
-
-  setTimeout(() => {
-    document.body.addEventListener('click', listener)
-    activeGroup.value = group
-  })
-}
-</script>
 
 <style lang="scss" scoped>
 .navigation-bar {

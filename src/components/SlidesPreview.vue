@@ -1,11 +1,3 @@
-<template>
-  <div :id="containerId" class="slides-preview">
-    <template v-for="(slide, i) in slidesMarkup" :key="i">
-      <div class="slides-preview__slide slide-typography" v-html="slide" />
-    </template>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { marked } from 'marked'
@@ -36,6 +28,14 @@ const slidesMarkup = computed(() => {
   ).split(/\n(?=<h[12])/)
 })
 </script>
+
+<template>
+  <div :id="containerId" class="slides-preview">
+    <template v-for="(slide, i) in slidesMarkup" :key="i">
+      <div class="slides-preview__slide slide-typography" v-html="slide" />
+    </template>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @use 'sass:math';

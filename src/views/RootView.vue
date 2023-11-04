@@ -1,29 +1,3 @@
-<template>
-  <div class="root-view">
-    <header class="root-view__header">
-      <a :href="appLogoLink" target="_blank">
-        <AppLogo />
-      </a>
-
-      <NavigationBar
-        @download="handleDownload"
-        @export="handleExport"
-        @upload="handleUpload"
-      />
-    </header>
-
-    <div class="root-view__split">
-      <MarkdownEditor
-        :placeholder="t('MarkdownEditor.placeholder')"
-        :value="contentOpened"
-        @input="handleEditorInput"
-      />
-
-      <SlidesPreview :value="content" />
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -113,6 +87,32 @@ onMounted(() => {
   }
 })
 </script>
+
+<template>
+  <div class="root-view">
+    <header class="root-view__header">
+      <a :href="appLogoLink" target="_blank">
+        <AppLogo />
+      </a>
+
+      <NavigationBar
+        @download="handleDownload"
+        @export="handleExport"
+        @upload="handleUpload"
+      />
+    </header>
+
+    <div class="root-view__split">
+      <MarkdownEditor
+        :placeholder="t('MarkdownEditor.placeholder')"
+        :value="contentOpened"
+        @input="handleEditorInput"
+      />
+
+      <SlidesPreview :value="content" />
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 @import '@/styles/variables';
