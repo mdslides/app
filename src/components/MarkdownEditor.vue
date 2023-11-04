@@ -38,6 +38,7 @@ import {
   isMac,
   type EditorCommand,
 } from '@/utils'
+import { ToolbarButton } from '@/components'
 
 const commandGroups: EditorCommand[][] = [
   ['heading', 'bold', 'italic'],
@@ -175,10 +176,10 @@ const toolbarButtons = computed(() => {
   <div ref="container" class="markdown-editor">
     <div class="markdown-editor__toolbar">
       <template v-for="(buttonGroup, i) in toolbarButtons" :key="i">
-        <button
+        <ToolbarButton
           v-for="button in buttonGroup"
           :key="button.name"
-          :class="{ active: activeButtons[button.name] }"
+          :active="activeButtons[button.name]"
           :disabled="disabledButtons[button.name]"
           :title="button.tooltip"
           tabindex="-1"
@@ -204,7 +205,6 @@ const toolbarButtons = computed(() => {
     align-items: center;
     gap: 4px;
     padding: 16px 0;
-    min-height: 65px;
     border-bottom: 1px solid var(--color-border);
     overflow: auto hidden;
     user-select: none;
@@ -213,46 +213,6 @@ const toolbarButtons = computed(() => {
     &::after {
       content: '';
       flex: 0 0 16px;
-    }
-
-    button {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0;
-      min-width: 32px;
-      height: 32px;
-      border: 1px solid transparent;
-      border-radius: 50%;
-      background-color: transparent;
-      color: var(--color-text);
-      transition: border 0.1s;
-      cursor: pointer;
-
-      &:disabled {
-        cursor: default;
-        pointer-events: none;
-
-        svg {
-          fill: var(--color-border);
-        }
-      }
-
-      &:not(:disabled) {
-        &:hover {
-          border-color: var(--color-border);
-        }
-
-        &.active {
-          border-color: var(--color-text);
-        }
-      }
-
-      svg {
-        width: 22px;
-        height: 22px;
-        fill: var(--color-text);
-      }
     }
 
     .separator {

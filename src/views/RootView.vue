@@ -11,6 +11,7 @@ import {
   MarkdownEditor,
   NavigationBar,
   SlidesPreview,
+  SlidesPreviewToolbar,
 } from '@/components'
 
 const autosaveKey = 'mdslides_draft'
@@ -111,7 +112,11 @@ onMounted(() => {
         @input="handleEditorInput"
       />
 
-      <SlidesPreview :value="content" />
+      <div>
+        <SlidesPreviewToolbar />
+
+        <SlidesPreview :value="content" />
+      </div>
     </div>
   </div>
 </template>
@@ -174,7 +179,7 @@ onMounted(() => {
         }
 
         &:last-child {
-          flex-basis: calc(25vh + 32px); // Safari fallback
+          flex-basis: calc(25vh + 32px + 65px); // Safari fallback
           min-height: 0;
         }
       }

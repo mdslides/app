@@ -14,5 +14,6 @@ module.exports = {
   },
   rules: {
     'vue/no-v-html': 'off',
+    'vue/no-v-text-v-html-on-component': 'off',
   },
 }

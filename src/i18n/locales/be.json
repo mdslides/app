@@ -14,7 +14,6 @@
       "ul": "Markavany śpis",
       "undo": "Admianić"
     },
-
     "placeholder": "Pačnicie nabirać tekst tut..."
   },
   "NavigationBar": {
@@ -22,5 +21,6 @@
     "exportAsPDF": "Ekspartavać jak PDF",
     "file": "Fajł",
     "open": "Adkryć Markdown fajł"
-  }
+  },
+  "preview": "Prahlad"
 }
