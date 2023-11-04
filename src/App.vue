@@ -3,8 +3,7 @@ import {
   useLanguageInitialize,
   useLanguagePreserve,
 } from '@/functions/language'
-
-import RootView from './views/RootView.vue'
+import { RootView } from '@/views'
 
 useLanguagePreserve()
 useLanguageInitialize()

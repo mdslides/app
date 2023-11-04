@@ -6,10 +6,12 @@ import { fileOpen, fileSave } from 'browser-fs-access'
 
 import { previewContainerId } from '@/constants'
 import { createPdf, getTitle, isLocalStorageAvailable } from '@/utils'
-import AppLogo from '../components/AppLogo.vue'
-import MarkdownEditor from '../components/MarkdownEditor.vue'
-import NavigationBar from '../components/NavigationBar.vue'
-import SlidesPreview from '../components/SlidesPreview.vue'
+import {
+  AppLogo,
+  MarkdownEditor,
+  NavigationBar,
+  SlidesPreview,
+} from '@/components'
 
 const autosaveKey = 'mdslides_draft'
 
