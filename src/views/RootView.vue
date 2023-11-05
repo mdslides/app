@@ -11,7 +11,6 @@ import {
   MarkdownEditor,
   NavigationBar,
   SlidesPreview,
-  SlidesPreviewToolbar,
 } from '@/components'
 
 const autosaveKey = 'mdslides_draft'
@@ -112,11 +111,7 @@ onMounted(() => {
         @input="handleEditorInput"
       />
 
-      <div>
-        <SlidesPreviewToolbar />
-
-        <SlidesPreview :value="content" />
-      </div>
+      <SlidesPreview :value="content" />
     </div>
   </div>
 </template>

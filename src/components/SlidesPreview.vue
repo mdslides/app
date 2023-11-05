@@ -1,10 +1,14 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { marked } from 'marked'
 import sanitizeHtml from 'sanitize-html'
 
+import playArrowIcon from '@material-design-icons/svg/sharp/play_arrow.svg?raw'
+
 import { previewContainerId } from '@/constants'
 import { useSlidesStore } from '@/stores/slides'
+import { ToolbarButton } from '@/components'
 
 const markedOptions: marked.MarkedOptions = {
   breaks: true,
@@ -20,7 +24,7 @@ const props = defineProps<{
   value: string
 }>()
 
-const containerId = ref(previewContainerId)
+const { t } = useI18n()
 const slidesStore = useSlidesStore()
 
 const slidesMarkup = computed(() => {
@@ -32,16 +36,24 @@ const slidesMarkup = computed(() => {
 </script>
 
 <template>
-  <div
-    :id="containerId"
-    class="slides-preview"
-    :class="{
-      'slides-preview--full': slidesStore.isPlaying,
-    }"
-  >
-    <template v-for="(slide, i) in slidesMarkup" :key="i">
-      <div class="slides-preview__slide slide-typography" v-html="slide" />
-    </template>
+  <div class="slides-preview">
+    <div class="slides-preview__toolbar">
+      <span>{{ t('preview') }}</span>
+
+      <ToolbarButton @click="slidesStore.play" v-html="playArrowIcon" />
+    </div>
+
+    <div
+      :id="previewContainerId"
+      class="slides-preview__content"
+      :class="{
+        'slides-preview__content--full': slidesStore.isPlaying,
+      }"
+    >
+      <template v-for="(slide, i) in slidesMarkup" :key="i">
+        <div class="slides-preview__slide slide-typography" v-html="slide" />
+      </template>
+    </div>
   </div>
 </template>
 
@@ -57,27 +69,40 @@ $slideFont: 0.009;
 
 .slides-preview {
   $self: &;
-  padding: 16px;
-  height: calc(100% - 65px);
-  overflow: auto;
 
-  &--full {
-    display: block !important;
-    position: fixed;
-    top: 0;
-    left: 0;
-    padding: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: #fff;
-    z-index: 1000;
+  &__toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    line-height: 32px;
+    border-bottom: 1px solid var(--color-border);
+    font-weight: 600;
+    user-select: none;
+  }
 
-    #{$self}__slide {
-      $slideWidth: 100vw;
-      margin: 0 auto;
-      width: $slideWidth;
-      height: math.div($slideWidth, $slideRatio);
-      font-size: math.div($slideWidth * $slideFont, $slideSize);
+  &__content {
+    padding: 16px;
+    height: calc(100% - 65px);
+    overflow: auto;
+
+    &--full {
+      display: block !important;
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #fff;
+      z-index: 1000;
+
+      #{$self}__slide {
+        margin: 0 auto !important;
+        width: 100vw !important;
+        height: math.div(100vw, $slideRatio) !important;
+        font-size: math.div(100vw * $slideFont, $slideSize) !important;
+      }
     }
   }
 
@@ -102,24 +127,26 @@ $slideFont: 0.009;
   }
 
   @include media-breakpoint-down($sm) {
-    display: flex;
-    padding-right: 0;
-    padding-left: 0;
+    &__content {
+      display: flex;
+      padding-right: 0;
+      padding-left: 0;
 
-    &::before,
-    &::after {
-      content: '';
-      flex: 0 0 16px;
-    }
+      &::before,
+      &::after {
+        content: '';
+        flex: 0 0 16px;
+      }
 
-    &__slide {
-      flex: 0 0 (100vh * $slideSize * $slideRatio);
-      height: 100vh * $slideSize;
-      font-size: 100vh * $slideFont * $slideRatio;
+      #{$self}__slide {
+        flex: 0 0 (100vh * $slideSize * $slideRatio);
+        height: 100vh * $slideSize;
+        font-size: 100vh * $slideFont * $slideRatio;
 
-      & + * {
-        margin-top: 0;
-        margin-left: 16px;
+        & + * {
+          margin-top: 0;
+          margin-left: 16px;
+        }
       }
     }
   }
