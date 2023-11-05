@@ -6,7 +6,7 @@ import sanitizeHtml from 'sanitize-html'
 
 import playArrowIcon from '@material-design-icons/svg/sharp/play_arrow.svg?raw'
 
-import { previewContainerId } from '@/constants'
+import { PREVIEW_CONTAINER_ID } from '@/constants'
 import { useSlidesStore } from '@/stores/slides'
 import { ToolbarButton } from '@/components'
 
@@ -44,7 +44,7 @@ const slidesMarkup = computed(() => {
     </div>
 
     <div
-      :id="previewContainerId"
+      :id="PREVIEW_CONTAINER_ID"
       class="slides-preview__content"
       :class="{
         'slides-preview__content--full': slidesStore.isPlaying,

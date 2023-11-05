@@ -4,7 +4,12 @@ import { useI18n } from 'vue-i18n'
 import { debounce } from 'lodash'
 import { fileOpen, fileSave } from 'browser-fs-access'
 
-import { previewContainerId } from '@/constants'
+import {
+  AUTOSAVE_DELAY,
+  AUTOSAVE_KEY,
+  EDITOR_INPUT_DELAY,
+  PREVIEW_CONTAINER_ID,
+} from '@/constants'
 import { createPdf, getTitle, isLocalStorageAvailable } from '@/utils'
 import {
   AppLogo,
@@ -12,8 +17,6 @@ import {
   NavigationBar,
   SlidesPreview,
 } from '@/components'
-
-const autosaveKey = 'mdslides_draft'
 
 const { fallbackLocale, locale, t } = useI18n()
 const content = ref('')
@@ -36,11 +39,11 @@ const handleDownload = async () => {
 
 const handleEditorInput = debounce((value: string) => {
   content.value = value
-}, 100)
+}, EDITOR_INPUT_DELAY)
 
 const handleExport = async () => {
   try {
-    const slidesContainer = document.getElementById(previewContainerId)
+    const slidesContainer = document.getElementById(PREVIEW_CONTAINER_ID)
     if (slidesContainer?.children.length) {
       const blob = await createPdf(slidesContainer.children)
       await fileSave(blob, {
@@ -78,14 +81,14 @@ if (isLocalStorageAvailable()) {
   watch(
     content,
     debounce(() => {
-      localStorage.setItem(autosaveKey, content.value)
-    }, 1600)
+      localStorage.setItem(AUTOSAVE_KEY, content.value)
+    }, AUTOSAVE_DELAY)
   )
 }
 
 onMounted(() => {
   if (isLocalStorageAvailable()) {
-    setContent(localStorage.getItem(autosaveKey) ?? '')
+    setContent(localStorage.getItem(AUTOSAVE_KEY) ?? '')
   }
 })
 </script>

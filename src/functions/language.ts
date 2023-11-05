@@ -1,10 +1,8 @@
 import { watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { LANGUAGE_KEY, LANGUAGE_PARAM } from '@/constants'
 import { isLocalStorageAvailable } from '@/utils'
-
-const languageKey = 'mdslides_language'
-const languageParam = 'lang'
 
 export const useLanguageInitialize = () => {
   const { availableLocales, fallbackLocale, locale } = useI18n({
@@ -12,10 +10,10 @@ export const useLanguageInitialize = () => {
   })
 
   const url = new URL(window.location.href)
-  const requestedLocale = url.searchParams.get(languageParam)
+  const requestedLocale = url.searchParams.get(LANGUAGE_PARAM)
 
   if (requestedLocale) {
-    url.searchParams.delete(languageParam)
+    url.searchParams.delete(LANGUAGE_PARAM)
     window.history.pushState(undefined, '', url)
   }
 
@@ -23,7 +21,7 @@ export const useLanguageInitialize = () => {
     locale.value = requestedLocale
   } else if (isLocalStorageAvailable()) {
     locale.value =
-      localStorage.getItem(languageKey) ?? (fallbackLocale.value as string)
+      localStorage.getItem(LANGUAGE_KEY) ?? (fallbackLocale.value as string)
   }
 }
 
@@ -32,7 +30,7 @@ export const useLanguagePreserve = () => {
 
   if (isLocalStorageAvailable()) {
     watch(locale, () => {
-      localStorage.setItem(languageKey, String(locale.value))
+      localStorage.setItem(LANGUAGE_KEY, String(locale.value))
     })
   }
 }
