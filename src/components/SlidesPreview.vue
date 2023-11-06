@@ -63,7 +63,9 @@ const slidesMarkup = computed(() => {
 @import '@/styles/variables';
 @import '@/styles/mixins';
 
-$slideRatio: math.div(4, 3);
+$slideRatioW: 4;
+$slideRatioH: 3;
+$slideRatio: math.div($slideRatioW, $slideRatioH);
 $slideSize: 0.25;
 $slideFont: 0.009;
 
@@ -94,14 +96,21 @@ $slideFont: 0.009;
       padding: 0;
       width: 100vw;
       height: 100vh;
-      background-color: #fff;
+      background-color: #000;
       z-index: 1000;
 
       #{$self}__slide {
         margin: 0 auto !important;
         width: 100vw !important;
         height: math.div(100vw, $slideRatio) !important;
+        box-shadow: 0 0 0 1px #ddd;
         font-size: math.div(100vw * $slideFont, $slideSize) !important;
+
+        @media (min-aspect-ratio: (#{$slideRatioW} / #{$slideRatioH})) {
+          width: 100vh * $slideRatio !important;
+          height: 100vh !important;
+          font-size: 100vh * $slideFont * math.div($slideRatio, $slideSize) !important;
+        }
       }
     }
   }
