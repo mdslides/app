@@ -88,55 +88,7 @@ $slideFont: 0.009;
     height: calc(100% - 65px);
     overflow: auto;
 
-    &--full {
-      display: block !important;
-      position: fixed;
-      top: 0;
-      left: 0;
-      padding: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: #000;
-      z-index: 1000;
-
-      #{$self}__slide {
-        margin: 0 auto !important;
-        width: 100vw !important;
-        height: math.div(100vw, $slideRatio) !important;
-        box-shadow: 0 0 0 1px #ddd;
-        font-size: math.div(100vw * $slideFont, $slideSize) !important;
-
-        @media (min-aspect-ratio: (#{$slideRatioW} / #{$slideRatioH})) {
-          width: 100vh * $slideRatio !important;
-          height: 100vh !important;
-          font-size: 100vh * $slideFont * math.div($slideRatio, $slideSize) !important;
-        }
-      }
-    }
-  }
-
-  &__slide {
-    width: 100vw * $slideSize;
-    height: math.div(100vw * $slideSize, $slideRatio);
-    box-shadow: 0 0 0 1px var(--color-border);
-    font-size: 100vw * $slideFont;
-    overflow: hidden;
-
-    & + * {
-      margin-top: 16px;
-    }
-  }
-
-  @include media-breakpoint-up($lg) {
-    &__slide {
-      width: $lg * $slideSize;
-      height: math.div($lg * $slideSize, $slideRatio);
-      font-size: $lg * $slideFont;
-    }
-  }
-
-  @include media-breakpoint-down($sm) {
-    &__content {
+    @include media-breakpoint-down($sm) {
       display: flex;
       padding-right: 0;
       padding-left: 0;
@@ -158,10 +110,52 @@ $slideFont: 0.009;
         }
       }
     }
+
+    &--full {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #000;
+      z-index: 1000;
+
+      #{$self}__slide {
+        margin: 0 auto;
+        width: 100vw;
+        height: math.div(100vw, $slideRatio);
+        box-shadow: 0 0 0 1px #ddd;
+        font-size: math.div(100vw * $slideFont, $slideSize);
+
+        @media (min-aspect-ratio: (#{$slideRatioW} / #{$slideRatioH})) {
+          width: 100vh * $slideRatio;
+          height: 100vh;
+          font-size: 100vh * $slideFont * math.div($slideRatio, $slideSize);
+        }
+      }
+    }
   }
 
-  @include color-scheme-dark {
-    &__slide {
+  &__slide {
+    width: 100vw * $slideSize;
+    height: math.div(100vw * $slideSize, $slideRatio);
+    box-shadow: 0 0 0 1px var(--color-border);
+    font-size: 100vw * $slideFont;
+    overflow: hidden;
+
+    & + * {
+      margin-top: 16px;
+    }
+
+    @include media-breakpoint-up($lg) {
+      width: $lg * $slideSize;
+      height: math.div($lg * $slideSize, $slideRatio);
+      font-size: $lg * $slideFont;
+    }
+
+    @include color-scheme-dark {
       box-shadow: none;
     }
   }
