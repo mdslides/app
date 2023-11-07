@@ -40,7 +40,11 @@ const slidesMarkup = computed(() => {
     <div class="slides-preview__toolbar">
       <span>{{ t('preview') }}</span>
 
-      <ToolbarButton @click="slidesStore.play" v-html="playArrowIcon" />
+      <ToolbarButton
+        :title="t('preview')"
+        @click="slidesStore.play"
+        v-html="playArrowIcon"
+      />
     </div>
 
     <div
