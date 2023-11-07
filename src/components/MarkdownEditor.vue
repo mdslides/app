@@ -41,10 +41,9 @@ import {
 import { ToolbarButton } from '@/components'
 
 const commandGroups: EditorCommand[][] = [
-  ['heading', 'bold', 'italic'],
+  ['heading', 'bold', 'italic', 'clean'],
   ['ul', 'ol', 'blockquote'],
   ['image', 'table', 'hr'],
-  ['clean'],
   ['undo', 'redo'],
 ]
 
